@@ -16,8 +16,12 @@ pub enum SensorData {
 }
 
 impl SensorData {
-    pub fn from_manufacturer_specific_data(_id: u16, _value: &[u8]) -> Result<Self, ParseError> {
-        unimplemented!();
+    pub fn from_manufacturer_specific_data(id: u16, _value: &[u8]) -> Result<Self, ParseError> {
+        if id == 0x0499 {
+            unimplemented!();
+        } else {
+            Err(UnknownManufacturerId(id))
+        }
     }
 }
 
@@ -70,7 +74,6 @@ mod tests {
     use super::*;
 
     #[test]
-    #[should_panic]
     fn parse_unsupported_manufacturer_id() {
         let data = vec![3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         let result = SensorData::from_manufacturer_specific_data(0x0477, &data);
