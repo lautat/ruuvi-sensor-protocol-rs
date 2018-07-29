@@ -6,9 +6,8 @@ use self::ParseError::*;
 
 pub enum SensorData {
     Version3 {
-        humidity: u8,
-        temperature: i8,
-        temperature_fraction: i8,
+        humidity: u32,
+        temperature: i32,
         pressure: u16,
         acceleration: AccelerationVector,
         battery_voltage: u16,
