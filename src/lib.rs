@@ -4,6 +4,7 @@ use std::{
 
 use self::ParseError::*;
 
+#[derive(Debug)]
 pub enum SensorData {
     Version3 {
         humidity: u32,
@@ -15,7 +16,7 @@ pub enum SensorData {
 }
 
 impl SensorData {
-    pub fn parse_from_manufacturer_specific_data(
+    pub fn from_manufacturer_specific_data(
         _id: u16,
         _value: &[u8],
     ) -> Result<Self, ParseError> {
@@ -23,9 +24,10 @@ impl SensorData {
     }
 }
 
+#[derive(Debug)]
 pub struct AccelerationVector(i16, i16, i16);
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ParseError {
     UnknownManufacturerId(u16),
     UnknownDataFormatVersion(u8),
@@ -66,8 +68,23 @@ impl Error for ParseError {}
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    #[should_panic]
+    fn parse_unsupported_manufacturer_id() {
+        let data = vec![3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let result = SensorData::from_manufacturer_specific_data(0x0477, &data);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), UnknownManufacturerId(0x0477));
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_unsupported_data_format() {
+        let data = vec![0, 1, 2, 3];
+        let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), UnknownDataFormatVersion(0));
     }
 }
