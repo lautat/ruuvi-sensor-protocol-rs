@@ -1,0 +1,6 @@
+[package]
+name = "ruuvi-sensor-protocol"
+version = "0.1.0"
+authors = ["Atte Lautanala <atte.lautanala@gmail.com>"]
+
+[dependencies]
