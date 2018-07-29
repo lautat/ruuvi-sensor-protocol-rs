@@ -21,7 +21,7 @@ impl SensorData {
             let format_version = value[0];
 
             if value[0] == 3 {
-                unimplemented!();
+                Self::from_version_3_format(value)
             } else {
                 Err(UnsupportedDataFormatVersion(format_version))
             }
@@ -29,6 +29,20 @@ impl SensorData {
             Err(EmptyValue)
         } else {
             Err(UnknownManufacturerId(id))
+        }
+    }
+
+    fn from_version_3_format(value: &[u8]) -> Result<Self, ParseError> {
+        let length = value.len();
+
+        if value.len() == 14 {
+            unimplemented!();
+        } else {
+            Err(InvalidValueLength {
+                version: 3,
+                length,
+                expected: 14,
+            })
         }
     }
 }
@@ -106,7 +120,6 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn parse_version_3_data_with_invalid_length() {
         let data = vec![3, 103, 22, 50, 60, 70];
         let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
