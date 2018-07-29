@@ -1,3 +1,5 @@
+mod sensordata;
+
 use std::{
     error::Error, fmt::{self, Display, Formatter},
 };
