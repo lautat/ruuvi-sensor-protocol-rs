@@ -32,11 +32,29 @@ impl SensorData {
         }
     }
 
+    pub fn temperature_millicelsius(&self) -> Option<i32> {
+        match self {
+            SensorData::Version3 {
+                humidity: _humidity,
+                temperature,
+                pressure: _pressure,
+                acceleration: _acceleration,
+                battery_voltage: _battery_voltage,
+            } => Some(*temperature)
+        }
+    }
+
     fn from_version_3_format(value: &[u8]) -> Result<Self, ParseError> {
         let length = value.len();
 
         if value.len() == 14 {
-            unimplemented!();
+            Ok(SensorData::Version3 {
+                humidity: 0,
+                temperature: version_3_temperature(value),
+                pressure: 0,
+                acceleration: AccelerationVector(0, 0, 0),
+                battery_voltage: 0,
+            })
         } else {
             Err(InvalidValueLength {
                 version: 3,
@@ -45,6 +63,10 @@ impl SensorData {
             })
         }
     }
+}
+
+fn version_3_temperature(value: &[u8]) -> i32 {
+    i32::from(value[2] as i8) * 1000 + i32::from(value[3]) * 10
 }
 
 #[derive(Debug)]
@@ -97,32 +119,32 @@ mod tests {
 
     #[test]
     fn parse_unsupported_manufacturer_id() {
-        let data = vec![3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        let result = SensorData::from_manufacturer_specific_data(0x0477, &data);
+        let value = vec![3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let result = SensorData::from_manufacturer_specific_data(0x0477, &value);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), UnknownManufacturerId(0x0477));
     }
 
     #[test]
     fn parse_unsupported_data_format() {
-        let data = vec![0, 1, 2, 3];
-        let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
+        let value = vec![0, 1, 2, 3];
+        let result = SensorData::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), UnsupportedDataFormatVersion(0));
     }
 
     #[test]
     fn parse_empty_data() {
-        let data = vec![];
-        let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
+        let value = vec![];
+        let result = SensorData::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), EmptyValue);
     }
 
     #[test]
     fn parse_version_3_data_with_invalid_length() {
-        let data = vec![3, 103, 22, 50, 60, 70];
-        let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
+        let value = vec![3, 103, 22, 50, 60, 70];
+        let result = SensorData::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
@@ -132,5 +154,13 @@ mod tests {
                 expected: 14
             }
         );
+    }
+
+    #[test]
+    fn parse_version_3_humidity() {
+        let value = vec![3, 0, 0x01, 0x45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let result = SensorData::from_manufacturer_specific_data(0x0499, &value);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().temperature_millicelsius(), Some(1690));
     }
 }
