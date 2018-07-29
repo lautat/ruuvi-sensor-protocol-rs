@@ -18,7 +18,13 @@ pub enum SensorData {
 impl SensorData {
     pub fn from_manufacturer_specific_data(id: u16, value: &[u8]) -> Result<Self, ParseError> {
         if id == 0x0499 && value.len() > 0 {
-            unimplemented!();
+            let format_version = value[0];
+
+            if value[0] == 3 {
+                unimplemented!();
+            } else {
+                Err(UnsupportedDataFormatVersion(format_version))
+            }
         } else if value.len() == 0 {
             Err(EmptyValue)
         } else {
@@ -33,7 +39,7 @@ pub struct AccelerationVector(i16, i16, i16);
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
     UnknownManufacturerId(u16),
-    UnknownDataFormatVersion(u8),
+    UnsupportedDataFormatVersion(u8),
     InvalidValueLength {
         version: u8,
         length: usize,
@@ -50,9 +56,9 @@ impl Display for ParseError {
                 "Unknown manufacturer id {:#04X}, only 0x0499 is supported",
                 id
             ),
-            UnknownDataFormatVersion(data_format) => write!(
+            UnsupportedDataFormatVersion(data_format) => write!(
                 formatter,
-                "Unknown data format version {}, only version 3 is supported",
+                "Unsupported data format version {}, only version 3 is supported",
                 data_format
             ),
             InvalidValueLength {
@@ -84,12 +90,11 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn parse_unsupported_data_format() {
         let data = vec![0, 1, 2, 3];
         let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), UnknownDataFormatVersion(0));
+        assert_eq!(result.unwrap_err(), UnsupportedDataFormatVersion(0));
     }
 
     #[test]
