@@ -16,10 +16,7 @@ pub enum SensorData {
 }
 
 impl SensorData {
-    pub fn from_manufacturer_specific_data(
-        _id: u16,
-        _value: &[u8],
-    ) -> Result<Self, ParseError> {
+    pub fn from_manufacturer_specific_data(_id: u16, _value: &[u8]) -> Result<Self, ParseError> {
         unimplemented!();
     }
 }
@@ -31,7 +28,7 @@ pub struct AccelerationVector(i16, i16, i16);
 pub enum ParseError {
     UnknownManufacturerId(u16),
     UnknownDataFormatVersion(u8),
-    InvalidDataLength {
+    InvalidValueLength {
         version: u8,
         length: usize,
         expected: usize,
@@ -52,7 +49,7 @@ impl Display for ParseError {
                 "Unknown data format version {}, only version 3 is supported",
                 data_format
             ),
-            InvalidDataLength {
+            InvalidValueLength {
                 version,
                 length,
                 expected,
@@ -97,5 +94,21 @@ mod tests {
         let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), EmptyValue);
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_version_3_data_with_invalid_length() {
+        let data = vec![3, 103, 22, 50, 60, 70];
+        let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            InvalidValueLength {
+                version: 3,
+                length: 6,
+                expected: 14
+            }
+        );
     }
 }
