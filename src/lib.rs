@@ -36,6 +36,7 @@ pub enum ParseError {
         length: usize,
         expected: usize,
     },
+    EmptyValue,
 }
 
 impl Display for ParseError {
@@ -60,6 +61,7 @@ impl Display for ParseError {
                 "Invalid data length of {} for format version {}, expected length of {}",
                 length, version, expected
             ),
+            EmptyValue => write!(formatter, "Empty value, expected at least one byte"),
         }
     }
 }
@@ -86,5 +88,14 @@ mod tests {
         let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), UnknownDataFormatVersion(0));
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_empty_data() {
+        let data = vec![];
+        let result = SensorData::from_manufacturer_specific_data(0x0499, &data);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), EmptyValue);
     }
 }
