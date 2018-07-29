@@ -66,7 +66,11 @@ impl SensorData {
 }
 
 fn version_3_temperature(value: &[u8]) -> i32 {
-    i32::from(value[2] as i8) * 1000 + i32::from(value[3]) * 10
+    let absolute_value = i32::from(value[2] & 0x7F);
+    let sign = i32::from(value[2] >> 7) * -2 + 1;
+    let fraction = i32::from(value[3]);
+
+    sign * (absolute_value * 1000 + fraction * 10)
 }
 
 #[derive(Debug)]
@@ -157,10 +161,18 @@ mod tests {
     }
 
     #[test]
-    fn parse_version_3_humidity() {
+    fn parse_version_3_temperature() {
         let value = vec![3, 0, 0x01, 0x45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         let result = SensorData::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().temperature_millicelsius(), Some(1690));
+    }
+
+    #[test]
+    fn parse_version_3_negative_temperature() {
+        let value = vec![3, 0, 0x81, 0x45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let result = SensorData::from_manufacturer_specific_data(0x0499, &value);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().temperature_millicelsius(), Some(-1690));
     }
 }
