@@ -42,7 +42,7 @@ impl SensorData {
                 pressure: _pressure,
                 acceleration: _acceleration,
                 battery_voltage: _battery_voltage,
-            } => Some(*temperature)
+            } => Some(*temperature),
         }
     }
 
