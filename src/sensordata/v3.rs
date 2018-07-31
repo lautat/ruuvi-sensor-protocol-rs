@@ -7,3 +7,11 @@ pub struct SensorDataV3 {
 }
 
 pub struct AccelerationVectorV3(i16, i16, i16);
+
+impl SensorDataV3 {
+    pub fn from_manufacturer_specific_data(value: &[u8]) -> Result<Self, InvalidValueLength> {
+        unimplemented!();
+    }
+}
+
+pub struct InvalidValueLength;
