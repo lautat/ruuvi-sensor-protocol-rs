@@ -1,6 +1,8 @@
 mod v3;
 
-use std::{error::Error, fmt::{self, Display, Formatter}};
+use std::{
+    error::Error, fmt::{self, Display, Formatter},
+};
 
 use self::ParseError::*;
 
@@ -10,7 +12,7 @@ pub struct SensorData {
     temperature: Option<u32>,
     pressure: Option<u32>,
     acceleration: Option<AccelerationVector>,
-    battery_potential: Option<u16>
+    battery_potential: Option<u16>,
 }
 
 impl SensorData {
