@@ -7,13 +7,18 @@ use std::{
 use self::ParseError::*;
 use sensordata::v3::SensorDataV3;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct SensorData {
-    humidity: Option<u32>,
-    temperature: Option<u32>,
-    pressure: Option<u32>,
-    acceleration: Option<AccelerationVector>,
-    battery_potential: Option<u16>,
+    /// Humidity in parts per million
+    pub humidity: Option<u32>,
+    /// temperature in millicelsius
+    pub temperature: Option<u32>,
+    /// pressure in pascals
+    pub pressure: Option<u32>,
+    /// 3-dimensional acceleration vector, each component in milli-G
+    pub acceleration: Option<AccelerationVector>,
+    /// battery potential in millivolts
+    pub battery_potential: Option<u16>,
 }
 
 impl SensorData {
@@ -34,7 +39,7 @@ impl SensorData {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct AccelerationVector(i16, i16, i16);
 
 #[derive(Debug, PartialEq)]
