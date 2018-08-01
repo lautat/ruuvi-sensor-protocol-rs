@@ -1,4 +1,4 @@
-use sensordata::ParseError;
+use sensordata::{ParseError, SensorData};
 
 #[derive(Debug, PartialEq)]
 pub struct SensorDataV3 {
@@ -33,6 +33,12 @@ impl SensorDataV3 {
                 expected: 14,
             })
         }
+    }
+}
+
+impl Into<SensorData> for SensorDataV3 {
+    fn into(self) -> SensorData {
+        unimplemented!()
     }
 }
 

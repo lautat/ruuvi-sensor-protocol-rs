@@ -5,6 +5,7 @@ use std::{
 };
 
 use self::ParseError::*;
+use sensordata::v3::SensorDataV3;
 
 #[derive(Debug)]
 pub struct SensorData {
@@ -21,7 +22,7 @@ impl SensorData {
             let format_version = value[0];
 
             if value[0] == 3 {
-                unimplemented!();
+                SensorDataV3::from_manufacturer_specific_data(value).map(|data| data.into())
             } else {
                 Err(UnsupportedDataFormatVersion(format_version))
             }
@@ -118,5 +119,14 @@ mod tests {
                 expected: 14
             }
         );
+    }
+
+    #[test]
+    fn parse_valid_version_3_data() {
+        let value = vec![
+            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        ];
+        let result = SensorData::from_manufacturer_specific_data(0x0499, &value);
+        assert!(result.is_ok());
     }
 }
