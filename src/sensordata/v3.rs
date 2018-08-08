@@ -21,6 +21,10 @@ impl SensorDataV3 {
     pub fn pressure_pascals(&self) -> u32 {
         u32::from(self.pressure) + 50_000
     }
+
+    pub fn humidity_ppm(&self) -> u32 {
+        u32::from(self.humidity) * 5_000
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -101,7 +105,7 @@ mod tests {
     }
 
     #[test]
-    fn temperature_millicelsius() {
+    fn temperature_millicelsius_conversion() {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
@@ -110,7 +114,7 @@ mod tests {
     }
 
     #[test]
-    fn negative_temperature_millicelsius() {
+    fn negative_temperature_millicelsius_conversion() {
         let value = vec![
             3, 0x17, 0x81, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
@@ -119,11 +123,20 @@ mod tests {
     }
 
     #[test]
-    fn pressure_pascals() {
+    fn pressure_pascals_conversion() {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(result.pressure_pascals(), 63656);
+    }
+
+    #[test]
+    fn humidity_ppm_conversion() {
+        let value = vec![
+            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        ];
+        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        assert_eq!(result.humidity_ppm(), 115_000);
     }
 }
