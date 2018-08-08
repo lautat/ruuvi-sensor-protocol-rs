@@ -60,7 +60,7 @@ impl From<SensorValuesV3> for SensorValues {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct AccelerationVector(i16, i16, i16);
+pub struct AccelerationVector(pub i16, pub i16, pub i16);
 
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
