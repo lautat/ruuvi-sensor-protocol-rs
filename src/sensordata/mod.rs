@@ -5,7 +5,7 @@ use std::{
 };
 
 use self::ParseError::*;
-use sensordata::v3::SensorDataV3;
+use sensordata::v3::{AccelerationVectorV3, SensorDataV3};
 
 #[derive(Debug, PartialEq)]
 pub struct SensorData {
@@ -27,7 +27,7 @@ impl SensorData {
             let format_version = value[0];
 
             if value[0] == 3 {
-                SensorDataV3::from_manufacturer_specific_data(value).map(|data| data.into())
+                SensorDataV3::from_manufacturer_specific_data(value).map(Self::from)
             } else {
                 Err(UnsupportedDataFormatVersion(format_version))
             }
@@ -35,6 +35,20 @@ impl SensorData {
             Err(EmptyValue)
         } else {
             Err(UnknownManufacturerId(id))
+        }
+    }
+}
+
+impl From<SensorDataV3> for SensorData {
+    fn from(data: SensorDataV3) -> SensorData {
+        let AccelerationVectorV3(ref a_x, ref a_y, ref a_z) = data.acceleration;
+
+        SensorData {
+            humidity: Some(data.humidity_ppm()),
+            temperature: Some(data.temperature_millicelsius()),
+            pressure: Some(data.pressure_pascals()),
+            acceleration: Some(AccelerationVector(*a_x, *a_y, *a_z)),
+            battery_potential: Some(data.battery_potential)
         }
     }
 }
@@ -132,6 +146,16 @@ mod tests {
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorData::from_manufacturer_specific_data(0x0499, &value);
-        assert!(result.is_ok());
+
+        assert_eq!(
+            result,
+            Ok(SensorData {
+                humidity: Some(115_000),
+                temperature: Some(1690),
+                pressure: Some(63656),
+                acceleration: Some(AccelerationVector(1000, 1255, 1510)),
+                battery_potential: Some(2182)
+            })
+        );
     }
 }
