@@ -9,6 +9,16 @@ pub struct SensorDataV3 {
     battery_potential: u16,
 }
 
+impl SensorDataV3 {
+    pub fn temperature_millicelsius(&self) -> i32 {
+        let sign = i32::from(self.temperature >> 15) * -2 + 1;
+        let integer_part = i32::from((self.temperature >> 8) & 0x7F);
+        let decimal_part = i32::from(self.temperature & 0xFF);
+
+        sign * (integer_part * 1000 + decimal_part * 10)
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub struct AccelerationVectorV3(i16, i16, i16);
 
@@ -52,8 +62,6 @@ fn i16_from_two_bytes(b1: u8, b2: u8) -> i16 {
 
 #[cfg(test)]
 mod tests {
-    use sensordata::AccelerationVector;
-
     use super::*;
 
     #[test]
@@ -89,22 +97,20 @@ mod tests {
     }
 
     #[test]
-    fn parse_version_3_into_generic_structure() {
+    fn version_3_temperature_millicelsius() {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value);
-        assert!(result.is_ok());
+        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        assert_eq!(result.temperature_millicelsius(), 1690);
+    }
 
-        assert_eq!(
-            result.map(|data| data.into()),
-            Ok(SensorData {
-                humidity: Some(115_000),
-                temperature: Some(1690),
-                pressure: Some(63656),
-                acceleration: Some(AccelerationVector(1000, 1255, 1510)),
-                battery_potential: Some(2182)
-            })
-        );
+    #[test]
+    fn version_3_negative_temperature_millicelsius() {
+        let value = vec![
+            3, 0x17, 0x81, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        ];
+        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        assert_eq!(result.temperature_millicelsius(), -1690);
     }
 }
