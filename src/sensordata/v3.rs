@@ -17,6 +17,10 @@ impl SensorDataV3 {
 
         sign * (integer_part * 1000 + decimal_part * 10)
     }
+
+    pub fn pressure_pascals(&self) -> u32 {
+        u32::from(self.pressure) + 50_000
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -97,7 +101,7 @@ mod tests {
     }
 
     #[test]
-    fn version_3_temperature_millicelsius() {
+    fn temperature_millicelsius() {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
@@ -106,11 +110,20 @@ mod tests {
     }
 
     #[test]
-    fn version_3_negative_temperature_millicelsius() {
+    fn negative_temperature_millicelsius() {
         let value = vec![
             3, 0x17, 0x81, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(result.temperature_millicelsius(), -1690);
+    }
+
+    #[test]
+    fn pressure_pascals() {
+        let value = vec![
+            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        ];
+        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        assert_eq!(result.pressure_pascals(), 63656);
     }
 }
