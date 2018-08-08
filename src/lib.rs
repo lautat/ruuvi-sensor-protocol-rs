@@ -1,3 +1,3 @@
-mod sensordata;
+mod formats;
 
-pub use sensordata::{ParseError, SensorData};
+pub use formats::{ParseError, SensorData};

@@ -1,4 +1,4 @@
-use sensordata::ParseError;
+use formats::ParseError;
 
 #[derive(Debug, PartialEq)]
 pub struct SensorDataV3 {

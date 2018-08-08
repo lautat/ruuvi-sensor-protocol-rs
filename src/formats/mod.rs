@@ -5,7 +5,7 @@ use std::{
 };
 
 use self::ParseError::*;
-use sensordata::v3::{AccelerationVectorV3, SensorDataV3};
+use formats::v3::{AccelerationVectorV3, SensorDataV3};
 
 #[derive(Debug, PartialEq)]
 pub struct SensorData {
