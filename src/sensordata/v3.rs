@@ -28,7 +28,7 @@ impl SensorDataV3 {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct AccelerationVectorV3(i16, i16, i16);
+pub struct AccelerationVectorV3(pub i16, pub i16, pub i16);
 
 impl SensorDataV3 {
     pub fn from_manufacturer_specific_data(value: &[u8]) -> Result<Self, ParseError> {
@@ -138,5 +138,32 @@ mod tests {
         ];
         let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(result.humidity_ppm(), 115_000);
+    }
+
+    #[test]
+    fn acceleration_decode() {
+        let value = vec![
+            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        ];
+        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        assert_eq!(result.acceleration, AccelerationVectorV3(1000, 1255, 1510));
+    }
+
+    #[test]
+    fn negative_acceleration_decode() {
+        let value = vec![
+            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
+        ];
+        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        assert_eq!(result.acceleration, AccelerationVectorV3(-1000, -1255, -1510));
+    }
+
+    #[test]
+    fn battery_potential_decode() {
+        let value = vec![
+            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
+        ];
+        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        assert_eq!(result.battery_potential, 2182);
     }
 }
