@@ -1,5 +1,5 @@
 #[derive(Debug, PartialEq)]
-pub struct SensorDataV3 {
+pub struct SensorValuesV3 {
     humidity: u8,
     temperature: u16,
     pressure: u16,
@@ -7,7 +7,7 @@ pub struct SensorDataV3 {
     pub battery_potential: u16,
 }
 
-impl SensorDataV3 {
+impl SensorValuesV3 {
     pub fn temperature_millicelsius(&self) -> i32 {
         let sign = i32::from(self.temperature >> 15) * -2 + 1;
         let integer_part = i32::from((self.temperature >> 8) & 0x7F);
@@ -28,7 +28,7 @@ impl SensorDataV3 {
 #[derive(Debug, PartialEq)]
 pub struct AccelerationVectorV3(pub i16, pub i16, pub i16);
 
-impl SensorDataV3 {
+impl SensorValuesV3 {
     pub fn from_manufacturer_specific_data(value: &[u8]) -> Result<Self, InvalidValueLength> {
         if value.len() == 14 {
             Ok(Self {
@@ -66,7 +66,7 @@ mod tests {
     #[test]
     fn parse_version_3_data_with_invalid_length() {
         let value = vec![3, 103, 22, 50, 60, 70];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value);
+        let result = SensorValuesV3::from_manufacturer_specific_data(&value);
         assert_eq!(result, Err(InvalidValueLength));
     }
 
@@ -75,10 +75,10 @@ mod tests {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value);
+        let result = SensorValuesV3::from_manufacturer_specific_data(&value);
         assert_eq!(
             result,
-            Ok(SensorDataV3 {
+            Ok(SensorValuesV3 {
                 humidity: 0x17,
                 temperature: 0x0145,
                 pressure: 0x3558,
@@ -93,7 +93,7 @@ mod tests {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(result.temperature_millicelsius(), 1690);
     }
 
@@ -102,7 +102,7 @@ mod tests {
         let value = vec![
             3, 0x17, 0x81, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(result.temperature_millicelsius(), -1690);
     }
 
@@ -111,7 +111,7 @@ mod tests {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(result.pressure_pascals(), 63656);
     }
 
@@ -120,7 +120,7 @@ mod tests {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(result.humidity_ppm(), 115_000);
     }
 
@@ -129,7 +129,7 @@ mod tests {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(result.acceleration, AccelerationVectorV3(1000, 1255, 1510));
     }
 
@@ -138,7 +138,7 @@ mod tests {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
         ];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(
             result.acceleration,
             AccelerationVectorV3(-1000, -1255, -1510)
@@ -150,7 +150,7 @@ mod tests {
         let value = vec![
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
         ];
-        let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
+        let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
         assert_eq!(result.battery_potential, 2182);
     }
 }
