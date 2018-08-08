@@ -12,7 +12,7 @@ pub struct SensorData {
     /// Humidity in parts per million
     pub humidity: Option<u32>,
     /// temperature in millicelsius
-    pub temperature: Option<u32>,
+    pub temperature: Option<i32>,
     /// pressure in pascals
     pub pressure: Option<u32>,
     /// 3-dimensional acceleration vector, each component in milli-G
