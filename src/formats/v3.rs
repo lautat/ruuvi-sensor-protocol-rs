@@ -1,5 +1,3 @@
-use formats::ParseError;
-
 #[derive(Debug, PartialEq)]
 pub struct SensorDataV3 {
     humidity: u8,
@@ -31,7 +29,7 @@ impl SensorDataV3 {
 pub struct AccelerationVectorV3(pub i16, pub i16, pub i16);
 
 impl SensorDataV3 {
-    pub fn from_manufacturer_specific_data(value: &[u8]) -> Result<Self, ParseError> {
+    pub fn from_manufacturer_specific_data(value: &[u8]) -> Result<Self, InvalidValueLength> {
         if value.len() == 14 {
             Ok(Self {
                 humidity: value[1],
@@ -45,11 +43,7 @@ impl SensorDataV3 {
                 battery_potential: u16_from_two_bytes(value[12], value[13]),
             })
         } else {
-            Err(ParseError::InvalidValueLength {
-                version: 3,
-                length: value.len(),
-                expected: 14,
-            })
+            Err(InvalidValueLength)
         }
     }
 }
@@ -62,6 +56,9 @@ fn i16_from_two_bytes(b1: u8, b2: u8) -> i16 {
     u16_from_two_bytes(b1, b2) as i16
 }
 
+#[derive(Debug, PartialEq)]
+pub struct InvalidValueLength;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -70,14 +67,7 @@ mod tests {
     fn parse_version_3_data_with_invalid_length() {
         let value = vec![3, 103, 22, 50, 60, 70];
         let result = SensorDataV3::from_manufacturer_specific_data(&value);
-        assert_eq!(
-            result,
-            Err(ParseError::InvalidValueLength {
-                version: 3,
-                length: 6,
-                expected: 14
-            })
-        );
+        assert_eq!(result, Err(InvalidValueLength));
     }
 
     #[test]
@@ -149,7 +139,10 @@ mod tests {
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
         ];
         let result = SensorDataV3::from_manufacturer_specific_data(&value).unwrap();
-        assert_eq!(result.acceleration, AccelerationVectorV3(-1000, -1255, -1510));
+        assert_eq!(
+            result.acceleration,
+            AccelerationVectorV3(-1000, -1255, -1510)
+        );
     }
 
     #[test]

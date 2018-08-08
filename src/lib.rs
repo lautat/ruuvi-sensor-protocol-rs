@@ -1,3 +1,3 @@
 mod formats;
 
-pub use formats::{ParseError, SensorData};
+pub use formats::{AccelerationVector, ParseError, SensorData};
