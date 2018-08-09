@@ -1,6 +1,7 @@
 [package]
 name = "ruuvi-sensor-protocol"
-description = "Ruuvi sensor protocol library"
+description = "Ruuvi sensor protocol parser implementation"
+readme = "README.md"
 version = "0.1.1"
 authors = ["Atte Lautanala <atte.lautanala@gmail.com>"]
 license = "MIT"
