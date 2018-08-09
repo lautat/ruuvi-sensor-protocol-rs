@@ -22,9 +22,9 @@ pub struct SensorValues {
 
 impl SensorValues {
     /// Parses sensor values from payload encoded in manufacturer specific data -field. Function
-    /// returns an error if `id` does not match exptected `id` from manufacturer specific data, or
-    /// `value` is not in one of the supported formats. At the moment only format version 3 is
-    /// supported.
+    /// returns a `ParseError` if `id` does not match exptected `id` from manufacturer specific
+    /// data, or `value` is not in one of the supported formats. At the moment only format version
+    /// 3 is supported.
     ///
     /// # Examples
     ///
@@ -51,11 +51,7 @@ impl SensorValues {
                 if let Ok(values) = SensorValuesV3::from_manufacturer_specific_data(value) {
                     Ok(Self::from(values))
                 } else {
-                    Err(InvalidValueLength {
-                        version: 3,
-                        length: value.len(),
-                        expected: 14,
-                    })
+                    Err(InvalidValueLength(3, value.len(), 14))
                 }
             } else {
                 Err(UnsupportedFormatVersion(format_version))
@@ -94,11 +90,8 @@ pub enum ParseError {
     /// Format of the data is not supported by this crate
     UnsupportedFormatVersion(u8),
     /// Length of the value does not match expected length of the format
-    InvalidValueLength {
-        version: u8,
-        length: usize,
-        expected: usize,
-    },
+    InvalidValueLength(u8, usize, usize),
+    /// Format can not be determined from value due to it being empty
     EmptyValue,
 }
 
@@ -115,11 +108,7 @@ impl Display for ParseError {
                 "Unsupported data format version {}, only version 3 is supported",
                 format_version
             ),
-            InvalidValueLength {
-                version,
-                length,
-                expected,
-            } => write!(
+            InvalidValueLength(version, length, expected) => write!(
                 formatter,
                 "Invalid data length of {} for format version {}, expected length of {}",
                 length, version, expected
@@ -164,14 +153,7 @@ mod tests {
         let value = vec![3, 103, 22, 50, 60, 70];
         let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
-        assert_eq!(
-            result.unwrap_err(),
-            InvalidValueLength {
-                version: 3,
-                length: 6,
-                expected: 14
-            }
-        );
+        assert_eq!(result.unwrap_err(), InvalidValueLength(3, 6, 14));
     }
 
     #[test]
