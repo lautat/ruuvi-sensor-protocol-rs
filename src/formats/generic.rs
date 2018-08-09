@@ -5,6 +5,7 @@ use std::{
 use self::ParseError::*;
 use formats::v3::{AccelerationVectorV3, SensorValuesV3};
 
+/// Represents a set of values read from sensors on the device
 #[derive(Debug, PartialEq)]
 pub struct SensorValues {
     /// Humidity in parts per million
@@ -81,13 +82,18 @@ impl From<SensorValuesV3> for SensorValues {
     }
 }
 
+/// 3-dimensional vector which represents acceleration in each dimension in milli-G
 #[derive(Debug, PartialEq)]
 pub struct AccelerationVector(pub i16, pub i16, pub i16);
 
+/// Errors which can occur during parsing of manufacturer specific data
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
+    /// Manufacturer id does not match expected value
     UnknownManufacturerId(u16),
+    /// Format of the data is not supported by this crate
     UnsupportedFormatVersion(u8),
+    /// Length of the value does not match expected length of the format
     InvalidValueLength {
         version: u8,
         length: usize,
