@@ -1,6 +1,4 @@
-# ruuvi-sensor-protocol-rs
-[![Crates.io](https://img.shields.io/crates/v/ruuvi-sensor-protocol.svg)](https://crates.io/crates/ruuvi-sensor-protocol)
-[![Crates.io](https://img.shields.io/crates/l/ruuvi-sensor-protocol.svg)](https://crates.io/crates/ruuvi-sensor-protocol)
+# ruuvi-sensor-protocol-rs [![Crates.io](https://img.shields.io/crates/v/ruuvi-sensor-protocol.svg)](https://crates.io/crates/ruuvi-sensor-protocol) [![Docs.rs](https://docs.rs/ruuvi-sensor-protocol/badge.svg)](https://docs.rs/ruuvi-sensor-protocol) [![Crates.io](https://img.shields.io/crates/l/ruuvi-sensor-protocol.svg)](https://crates.io/crates/ruuvi-sensor-protocol)
 
 Ruuvi sensor protocol parser implementation
 
