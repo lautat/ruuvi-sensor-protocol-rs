@@ -7,10 +7,14 @@ description = "Ruuvi sensor protocol parser implementation"
 repository = "https://github.com/lautat/ruuvi-sensor-protocol-rs"
 readme = "README.md"
 keywords = ["ruuvi", "ruuvitag"]
-categories = ["parser-implementations"]
+categories = ["parser-implementations", "no-std"]
 license = "MIT"
 
 [badges.maintenance]
 status = "passively-maintained"
+
+[features]
+default = ["std"]
+std = []
 
 [dependencies]

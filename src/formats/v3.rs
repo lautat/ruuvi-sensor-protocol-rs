@@ -65,14 +65,14 @@ mod tests {
 
     #[test]
     fn parse_version_3_data_with_invalid_length() {
-        let value = vec![3, 103, 22, 50, 60, 70];
+        let value = [3, 103, 22, 50, 60, 70];
         let result = SensorValuesV3::from_manufacturer_specific_data(&value);
         assert_eq!(result, Err(InvalidValueLength));
     }
 
     #[test]
     fn parse_valid_version_3_data() {
-        let value = vec![
+        let value = [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::from_manufacturer_specific_data(&value);
@@ -90,7 +90,7 @@ mod tests {
 
     #[test]
     fn temperature_millicelsius_conversion() {
-        let value = vec![
+        let value = [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
@@ -99,7 +99,7 @@ mod tests {
 
     #[test]
     fn negative_temperature_millicelsius_conversion() {
-        let value = vec![
+        let value = [
             3, 0x17, 0x81, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn pressure_pascals_conversion() {
-        let value = vec![
+        let value = [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
@@ -117,7 +117,7 @@ mod tests {
 
     #[test]
     fn humidity_ppm_conversion() {
-        let value = vec![
+        let value = [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
@@ -126,7 +126,7 @@ mod tests {
 
     #[test]
     fn acceleration_decode() {
-        let value = vec![
+        let value = [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
@@ -135,7 +135,7 @@ mod tests {
 
     #[test]
     fn negative_acceleration_decode() {
-        let value = vec![
+        let value = [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
         ];
         let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();
@@ -147,7 +147,7 @@ mod tests {
 
     #[test]
     fn battery_potential_decode() {
-        let value = vec![
+        let value = [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
         ];
         let result = SensorValuesV3::from_manufacturer_specific_data(&value).unwrap();

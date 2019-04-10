@@ -1,6 +1,6 @@
-use std::{
-    error::Error, fmt::{self, Display, Formatter},
-};
+use core::fmt::{self, Display, Formatter};
+#[cfg(feature = "std")]
+use std::error::Error;
 
 use self::ParseError::*;
 use crate::formats::v3::{AccelerationVectorV3, SensorValuesV3};
@@ -118,6 +118,7 @@ impl Display for ParseError {
     }
 }
 
+#[cfg(feature = "std")]
 impl Error for ParseError {}
 
 #[cfg(test)]
@@ -126,7 +127,7 @@ mod tests {
 
     #[test]
     fn parse_unsupported_manufacturer_id() {
-        let value = vec![3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let value = [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         let result = SensorValues::from_manufacturer_specific_data(0x0477, &value);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), UnknownManufacturerId(0x0477));
@@ -134,7 +135,7 @@ mod tests {
 
     #[test]
     fn parse_unsupported_format() {
-        let value = vec![0, 1, 2, 3];
+        let value = [0, 1, 2, 3];
         let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), UnsupportedFormatVersion(0));
@@ -142,7 +143,7 @@ mod tests {
 
     #[test]
     fn parse_empty_data() {
-        let value = vec![];
+        let value = [];
         let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), EmptyValue);
@@ -150,7 +151,7 @@ mod tests {
 
     #[test]
     fn parse_version_3_data_with_invalid_length() {
-        let value = vec![3, 103, 22, 50, 60, 70];
+        let value = [3, 103, 22, 50, 60, 70];
         let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), InvalidValueLength(3, 6, 14));
@@ -158,7 +159,7 @@ mod tests {
 
     #[test]
     fn parse_valid_version_3_data() {
-        let value = vec![
+        let value = [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);

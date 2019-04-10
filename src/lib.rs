@@ -48,6 +48,8 @@ See [`SensorValues`](struct.SensorValues.html) documentation for a description o
 
 */
 
+#![cfg_attr(not(feature = "std"), no_std)]
+
 mod formats;
 
 pub use crate::formats::{AccelerationVector, ParseError, SensorValues};
