@@ -10,4 +10,7 @@ keywords = ["ruuvi", "ruuvitag"]
 categories = ["parser-implementations"]
 license = "MIT"
 
+[badges.maintenance]
+status = "passively-maintained"
+
 [dependencies]
