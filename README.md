@@ -15,9 +15,10 @@ Documentation is available online at
 from source with `cargo doc`. Examples are included in the documentation.
 
 ## Changes
-- `0.3.0`
-  - Requires 2018 Edition (Rust `>=1.31`)
-  - Adds option to compile without `std` create
+
+### `0.3.0`
+- Requires 2018 Edition (Rust `>=1.31`)
+- Adds option to compile without `std` create
 
 ## License
 This project is licensed under [MIT license](LICENSE).
