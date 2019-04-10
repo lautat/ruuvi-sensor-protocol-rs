@@ -3,7 +3,7 @@ use std::{
 };
 
 use self::ParseError::*;
-use formats::v3::{AccelerationVectorV3, SensorValuesV3};
+use crate::formats::v3::{AccelerationVectorV3, SensorValuesV3};
 
 /// Represents a set of values read from sensors on the device
 #[derive(Debug, PartialEq)]

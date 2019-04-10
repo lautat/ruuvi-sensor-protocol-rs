@@ -50,4 +50,4 @@ See [`SensorValues`](struct.SensorValues.html) documentation for a description o
 
 mod formats;
 
-pub use formats::{AccelerationVector, ParseError, SensorValues};
+pub use crate::formats::{AccelerationVector, ParseError, SensorValues};

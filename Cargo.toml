@@ -2,10 +2,11 @@
 name = "ruuvi-sensor-protocol"
 description = "Ruuvi sensor protocol parser implementation"
 readme = "README.md"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Atte Lautanala <atte.lautanala@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/lautat/ruuvi-sensor-protocol-rs"
 keywords = ["ruuvi", "ruuvitag"]
+edition = "2018"
 
 [dependencies]

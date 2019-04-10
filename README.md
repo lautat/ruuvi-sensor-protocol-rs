@@ -2,6 +2,9 @@
 
 Ruuvi sensor protocol parser implementation
 
+## Requirements
+- Rust `>=1.31`
+
 ## Documentation
 Documentation is available online at
 [docs.rs](https://docs.rs/ruuvi-sensor-protocol). Documentation can be built

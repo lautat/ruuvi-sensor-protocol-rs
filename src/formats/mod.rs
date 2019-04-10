@@ -1,4 +1,4 @@
 mod generic;
 mod v3;
 
-pub use formats::generic::{AccelerationVector, ParseError, SensorValues};
+pub use crate::formats::generic::{AccelerationVector, ParseError, SensorValues};
