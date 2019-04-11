@@ -31,20 +31,23 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
     type Error = InvalidValueLength;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        if value.len() == 14 {
-            Ok(Self {
-                humidity: value[1],
-                temperature: u16_from_two_bytes(value[2], value[3]),
-                pressure: u16_from_two_bytes(value[4], value[5]),
-                acceleration: AccelerationVectorV3(
-                    i16_from_two_bytes(value[6], value[7]),
-                    i16_from_two_bytes(value[8], value[9]),
-                    i16_from_two_bytes(value[10], value[11]),
-                ),
-                battery_potential: u16_from_two_bytes(value[12], value[13]),
-            })
-        } else {
-            Err(InvalidValueLength)
+        match value {
+            [3, humidity, temperature_1, temperature_2, pressure_1, pressure_2,
+             acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2,
+             acceleration_z_1, acceleration_z_2, potential_1, potential_2] => {
+                Ok(Self {
+                    humidity: *humidity,
+                    temperature: u16_from_two_bytes(*temperature_1, *temperature_2),
+                    pressure: u16_from_two_bytes(*pressure_1, *pressure_2),
+                    acceleration: AccelerationVectorV3(
+                        i16_from_two_bytes(*acceleration_x_1, *acceleration_x_2),
+                        i16_from_two_bytes(*acceleration_y_1, *acceleration_y_2),
+                        i16_from_two_bytes(*acceleration_z_1, *acceleration_z_2),
+                    ),
+                    battery_potential: u16_from_two_bytes(*potential_1, *potential_2),
+                })
+            }
+            _ => Err(InvalidValueLength)
         }
     }
 }
