@@ -47,7 +47,7 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
                     battery_potential: u16_from_two_bytes(*potential_1, *potential_2),
                 })
             }
-            _ => Err(InvalidValueLength)
+            _ => Err(InvalidValueLength(value.len()))
         }
     }
 }
@@ -64,7 +64,7 @@ fn i16_from_two_bytes(b1: u8, b2: u8) -> i16 {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct InvalidValueLength;
+pub struct InvalidValueLength(usize);
 
 #[cfg(test)]
 mod tests {
@@ -74,7 +74,7 @@ mod tests {
     fn parse_version_3_data_with_invalid_length() {
         let value: [u8; 6] = [3, 103, 22, 50, 60, 70];
         let result = SensorValuesV3::try_from(&value[..]);
-        assert_eq!(result, Err(InvalidValueLength));
+        assert_eq!(result, Err(InvalidValueLength(6)));
     }
 
     #[test]
