@@ -1,4 +1,4 @@
-use core::fmt::{self, Display, Formatter};
+use core::{convert::TryFrom, fmt::{self, Display, Formatter}};
 #[cfg(feature = "std")]
 use std::error::Error;
 
@@ -45,7 +45,7 @@ impl SensorValues {
             let format_version = value[0];
 
             if value[0] == 3 {
-                if let Ok(values) = SensorValuesV3::from_manufacturer_specific_data(value) {
+                if let Ok(values) = SensorValuesV3::try_from(value) {
                     Ok(Self::from(values))
                 } else {
                     Err(InvalidValueLength(3, value.len(), 14))
