@@ -59,11 +59,11 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
 pub struct AccelerationVectorV3(pub i16, pub i16, pub i16);
 
 fn u16_from_two_bytes(b1: u8, b2: u8) -> u16 {
-    ((b1 as u16) << 8) | b2 as u16
+    (u16::from(b1) << 8) | u16::from(b2)
 }
 
 fn i16_from_two_bytes(b1: u8, b2: u8) -> i16 {
-    u16_from_two_bytes(b1, b2) as i16
+    (i16::from(b1) << 8) | i16::from(b2)
 }
 
 #[derive(Debug, PartialEq)]
