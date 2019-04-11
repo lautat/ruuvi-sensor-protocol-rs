@@ -32,16 +32,13 @@ impl SensorValues {
     /// use ruuvi_sensor_protocol::SensorValues;
     /// # use ruuvi_sensor_protocol::ParseError;
     ///
-    /// # fn run() -> Result<(), ParseError> {
     /// let id = 0x0499;
     /// let value = &[
     ///     0x03, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
     /// ];
     /// let values = SensorValues::from_manufacturer_specific_data(id, value)?;
     /// assert_eq!(values.temperature, Some(1690));
-    /// # Ok(())
-    /// # }
-    /// # run().unwrap();
+    /// # Ok::<(), ParseError>(())
     /// ```
     pub fn from_manufacturer_specific_data(id: u16, value: &[u8]) -> Result<Self, ParseError> {
         if id == 0x0499 && value.len() > 0 {

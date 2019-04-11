@@ -27,7 +27,6 @@ Successful parse returns a `SensorValue` structure with a set of values.
 use ruuvi_sensor_protocol::{AccelerationVector, SensorValues};
 # use ruuvi_sensor_protocol::ParseError;
 
-# fn run() -> Result<(), ParseError> {
 let id = 0x0499;
 let value = &[
     0x03, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
@@ -39,9 +38,7 @@ assert_eq!(values.temperature, Some(1690));
 assert_eq!(values.pressure, Some(63656));
 assert_eq!(values.acceleration, Some(AccelerationVector(1000, 1255, 1510)));
 assert_eq!(values.battery_potential, Some(2182));
-# Ok(())
-# }
-# run().unwrap();
+# Ok::<(), ParseError>(())
 ```
 
 See [`SensorValues`](struct.SensorValues.html) documentation for a description of each value.
