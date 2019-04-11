@@ -5,8 +5,7 @@ use core::{
 #[cfg(feature = "std")]
 use std::error::Error;
 
-use self::ParseError::*;
-use crate::formats::v3::{AccelerationVectorV3, SensorValuesV3};
+use crate::formats::v3::{AccelerationVectorV3, InvalidValueLength, SensorValuesV3};
 
 /// Represents a set of values read from sensors on the device
 #[derive(Debug, PartialEq)]
@@ -48,18 +47,15 @@ impl SensorValues {
             let format_version = value[0];
 
             if value[0] == 3 {
-                if let Ok(values) = SensorValuesV3::try_from(value) {
-                    Ok(Self::from(values))
-                } else {
-                    Err(InvalidValueLength(3, value.len(), 14))
-                }
+                let values = SensorValuesV3::try_from(value)?;
+                Ok(Self::from(values))
             } else {
-                Err(UnsupportedFormatVersion(format_version))
+                Err(ParseError::UnsupportedFormatVersion(format_version))
             }
         } else if value.len() == 0 {
-            Err(EmptyValue)
+            Err(ParseError::EmptyValue)
         } else {
-            Err(UnknownManufacturerId(id))
+            Err(ParseError::UnknownManufacturerId(id))
         }
     }
 }
@@ -90,7 +86,7 @@ pub enum ParseError {
     /// Format of the data is not supported by this crate
     UnsupportedFormatVersion(u8),
     /// Length of the value does not match expected length of the format
-    InvalidValueLength(u8, usize, usize),
+    InvalidValueLength(InvalidValueLength),
     /// Format can not be determined from value due to it being empty
     EmptyValue,
 }
@@ -98,28 +94,37 @@ pub enum ParseError {
 impl Display for ParseError {
     fn fmt(&self, formatter: &mut Formatter) -> Result<(), fmt::Error> {
         match self {
-            UnknownManufacturerId(id) => write!(
+            ParseError::UnknownManufacturerId(id) => write!(
                 formatter,
                 "Unknown manufacturer id {:#04X}, only 0x0499 is supported",
                 id
             ),
-            UnsupportedFormatVersion(format_version) => write!(
+            ParseError::UnsupportedFormatVersion(format_version) => write!(
                 formatter,
                 "Unsupported data format version {}, only version 3 is supported",
                 format_version
             ),
-            InvalidValueLength(version, length, expected) => write!(
-                formatter,
-                "Invalid data length of {} for format version {}, expected length of {}",
-                length, version, expected
-            ),
-            EmptyValue => write!(formatter, "Empty value, expected at least one byte"),
+            ParseError::InvalidValueLength(inner) => write!(formatter, "{}", inner),
+            ParseError::EmptyValue => write!(formatter, "Empty value, expected at least one byte"),
         }
     }
 }
 
+impl From<InvalidValueLength> for ParseError {
+    fn from(error: InvalidValueLength) -> Self {
+        ParseError::InvalidValueLength(error)
+    }
+}
+
 #[cfg(feature = "std")]
-impl Error for ParseError {}
+impl Error for ParseError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            ParseError::InvalidValueLength(ref inner) => Some(inner),
+            _ => None,
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -130,7 +135,10 @@ mod tests {
         let value = [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         let result = SensorValues::from_manufacturer_specific_data(0x0477, &value);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), UnknownManufacturerId(0x0477));
+        assert_eq!(
+            result.unwrap_err(),
+            ParseError::UnknownManufacturerId(0x0477)
+        );
     }
 
     #[test]
@@ -138,7 +146,7 @@ mod tests {
         let value = [0, 1, 2, 3];
         let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), UnsupportedFormatVersion(0));
+        assert_eq!(result.unwrap_err(), ParseError::UnsupportedFormatVersion(0));
     }
 
     #[test]
@@ -146,7 +154,7 @@ mod tests {
         let value = [];
         let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), EmptyValue);
+        assert_eq!(result.unwrap_err(), ParseError::EmptyValue);
     }
 
     #[test]
@@ -154,7 +162,10 @@ mod tests {
         let value = [3, 103, 22, 50, 60, 70];
         let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), InvalidValueLength(3, 6, 14));
+        assert_eq!(
+            result.unwrap_err(),
+            ParseError::InvalidValueLength(InvalidValueLength(6))
+        );
     }
 
     #[test]

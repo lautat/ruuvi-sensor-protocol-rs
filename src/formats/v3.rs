@@ -67,12 +67,16 @@ fn i16_from_two_bytes(b1: u8, b2: u8) -> i16 {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct InvalidValueLength(usize);
+pub struct InvalidValueLength(pub usize);
 
 impl Display for InvalidValueLength {
     fn fmt(&self, formatter: &mut Formatter) -> Result<(), fmt::Error> {
         let Self(ref length) = self;
-        write!(formatter, "Invalid data length of {}, expected 14", length)
+        write!(
+            formatter,
+            "Invalid data length of {} for format version 3, expected 14",
+            length
+        )
     }
 }
 
