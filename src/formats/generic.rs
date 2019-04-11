@@ -1,4 +1,7 @@
-use core::{convert::TryFrom, fmt::{self, Display, Formatter}};
+use core::{
+    convert::TryFrom,
+    fmt::{self, Display, Formatter},
+};
 #[cfg(feature = "std")]
 use std::error::Error;
 

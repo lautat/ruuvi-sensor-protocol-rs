@@ -1,4 +1,9 @@
-use core::convert::TryFrom;
+use core::{
+    convert::TryFrom,
+    fmt::{self, Display, Formatter},
+};
+#[cfg(feature = "std")]
+use std::error::Error;
 
 #[derive(Debug, PartialEq)]
 pub struct SensorValuesV3 {
@@ -32,9 +37,7 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         match value {
-            [3, humidity, temperature_1, temperature_2, pressure_1, pressure_2,
-             acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2,
-             acceleration_z_1, acceleration_z_2, potential_1, potential_2] => {
+            [3, humidity, temperature_1, temperature_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, potential_1, potential_2] => {
                 Ok(Self {
                     humidity: *humidity,
                     temperature: u16_from_two_bytes(*temperature_1, *temperature_2),
@@ -47,7 +50,7 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
                     battery_potential: u16_from_two_bytes(*potential_1, *potential_2),
                 })
             }
-            _ => Err(InvalidValueLength(value.len()))
+            _ => Err(InvalidValueLength(value.len())),
         }
     }
 }
@@ -65,6 +68,16 @@ fn i16_from_two_bytes(b1: u8, b2: u8) -> i16 {
 
 #[derive(Debug, PartialEq)]
 pub struct InvalidValueLength(usize);
+
+impl Display for InvalidValueLength {
+    fn fmt(&self, formatter: &mut Formatter) -> Result<(), fmt::Error> {
+        let Self(ref length) = self;
+        write!(formatter, "Invalid data length of {}, expected 14", length)
+    }
+}
+
+#[cfg(feature = "std")]
+impl Error for InvalidValueLength {}
 
 #[cfg(test)]
 mod tests {
