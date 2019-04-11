@@ -8,23 +8,23 @@ use crate::formats::v3::{AccelerationVectorV3, SensorValuesV3};
 /// Represents a set of values read from sensors on the device
 #[derive(Debug, PartialEq)]
 pub struct SensorValues {
-    /// Humidity in parts per million
+    /// humidity in parts per million
     pub humidity: Option<u32>,
     /// temperature in millicelsius
     pub temperature: Option<i32>,
     /// pressure in pascals
     pub pressure: Option<u32>,
-    /// 3-dimensional acceleration vector, each component in milli-G
+    /// 3-dimensional acceleration vector, each component is in milli-G
     pub acceleration: Option<AccelerationVector>,
     /// battery potential in millivolts
     pub battery_potential: Option<u16>,
 }
 
 impl SensorValues {
-    /// Parses sensor values from payload encoded in manufacturer specific data -field. Function
-    /// returns a `ParseError` if `id` does not match exptected `id` from manufacturer specific
-    /// data, or `value` is not in one of the supported formats. At the moment only format version
-    /// 3 is supported.
+    /// Parses sensor values from the payload encoded in manufacturer specific data -field. The
+    /// function returns a `ParseError` if the `id` does not match the exptected `id` in the
+    /// manufacturer specific data, or the format of the `value` is not supported. At the moment
+    /// only version 3 of the format is supported.
     ///
     /// # Examples
     ///
@@ -79,7 +79,7 @@ impl From<SensorValuesV3> for SensorValues {
 #[derive(Debug, PartialEq)]
 pub struct AccelerationVector(pub i16, pub i16, pub i16);
 
-/// Errors which can occur during parsing of manufacturer specific data
+/// Errors which can occur during parsing of the manufacturer specific data
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
     /// Manufacturer id does not match expected value

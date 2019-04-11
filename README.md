@@ -3,21 +3,23 @@
 Ruuvi sensor protocol parser implementation
 
 ## Requirements
-- Rust `>=1.31`
+- Rust `>= 1.31`
   - This crate can be compiled without `std` by disabling default features
 
 ## Crate Features
 - `std` (default) enables features that depend on `std` crate
 
 ## Documentation
-Documentation is available online at
-[docs.rs](https://docs.rs/ruuvi-sensor-protocol). Documentation can be built
-from source with `cargo doc`. Examples are included in the documentation.
+Docs are available online at
+[docs.rs](https://docs.rs/ruuvi-sensor-protocol). They can be built
+from source with `cargo doc`. Examples are included in the docs.
 
 ## Changes
 
+### `0.4.0`
+
 ### `0.3.0`
-- Requires 2018 Edition (Rust `>=1.31`)
+- Requires 2018 Edition (Rust `>= 1.31`)
 - Adds option to compile without `std` create
 
 ## License

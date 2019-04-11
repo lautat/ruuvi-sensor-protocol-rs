@@ -1,6 +1,6 @@
 /*!
 
-ruuvi-sensor-protocol implements parser for [Ruuvi Sensor Protocols][1] used by
+ruuvi-sensor-protocol implements parser for [Ruuvi Sensor Protocols][1] used by the
 [RuuviTag sensor beacon][2].
 
 [1]: https://github.com/ruuvi/ruuvi-sensor-protocols
@@ -8,7 +8,7 @@ ruuvi-sensor-protocol implements parser for [Ruuvi Sensor Protocols][1] used by
 
 # Parsing a set of values from manufacturer specific data
 
-Parsing return an error due to unknown manufacturer id, unsupported tdata format version or
+Parsing may return an error due to unknown manufacturer id, unsupported data format version or
 invalid data in value field.
 
 ```rust
@@ -22,7 +22,7 @@ let result = SensorValues::from_manufacturer_specific_data(id, value);
 assert_eq!(result, Err(ParseError::UnsupportedFormatVersion(7)));
 ```
 
-Successful parse returns a `SensorValue` structure with a set of values.
+A successful parse returns a `SensorValue` structure with a set of values.
 ```rust
 use ruuvi_sensor_protocol::{AccelerationVector, SensorValues};
 # use ruuvi_sensor_protocol::ParseError;
