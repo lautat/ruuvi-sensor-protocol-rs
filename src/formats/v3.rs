@@ -37,7 +37,7 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         match value {
-            [3, humidity, temperature_1, temperature_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, potential_1, potential_2] => {
+            [humidity, temperature_1, temperature_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, potential_1, potential_2] => {
                 Ok(Self {
                     humidity: *humidity,
                     temperature: u16_from_two_bytes(*temperature_1, *temperature_2),
@@ -50,7 +50,7 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
                     battery_potential: u16_from_two_bytes(*potential_1, *potential_2),
                 })
             }
-            _ => Err(InvalidValueLength(value.len())),
+            _ => Err(InvalidValueLength(value.len() + 1)),
         }
     }
 }
@@ -89,15 +89,15 @@ mod tests {
 
     #[test]
     fn parse_version_3_data_with_invalid_length() {
-        let value: [u8; 6] = [3, 103, 22, 50, 60, 70];
+        let value: [u8; 5] = [103, 22, 50, 60, 70];
         let result = SensorValuesV3::try_from(&value[..]);
         assert_eq!(result, Err(InvalidValueLength(6)));
     }
 
     #[test]
     fn parse_valid_version_3_data() {
-        let value: [u8; 14] = [
-            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]);
         assert_eq!(
@@ -114,8 +114,8 @@ mod tests {
 
     #[test]
     fn temperature_millicelsius_conversion() {
-        let value: [u8; 14] = [
-            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
         assert_eq!(result.temperature_millicelsius(), 1690);
@@ -123,8 +123,8 @@ mod tests {
 
     #[test]
     fn negative_temperature_millicelsius_conversion() {
-        let value: [u8; 14] = [
-            3, 0x17, 0x81, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        let value: [u8; 13] = [
+            0x17, 0x81, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
         assert_eq!(result.temperature_millicelsius(), -1690);
@@ -132,8 +132,8 @@ mod tests {
 
     #[test]
     fn pressure_pascals_conversion() {
-        let value: [u8; 14] = [
-            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
         assert_eq!(result.pressure_pascals(), 63656);
@@ -141,8 +141,8 @@ mod tests {
 
     #[test]
     fn humidity_ppm_conversion() {
-        let value: [u8; 14] = [
-            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
         assert_eq!(result.humidity_ppm(), 115_000);
@@ -150,8 +150,8 @@ mod tests {
 
     #[test]
     fn acceleration_decode() {
-        let value: [u8; 14] = [
-            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
         assert_eq!(result.acceleration, AccelerationVectorV3(1000, 1255, 1510));
@@ -159,8 +159,8 @@ mod tests {
 
     #[test]
     fn negative_acceleration_decode() {
-        let value: [u8; 14] = [
-            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
         assert_eq!(
@@ -171,8 +171,8 @@ mod tests {
 
     #[test]
     fn battery_potential_decode() {
-        let value: [u8; 14] = [
-            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
         assert_eq!(result.battery_potential, 2182);

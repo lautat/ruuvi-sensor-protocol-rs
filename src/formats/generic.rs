@@ -47,7 +47,7 @@ impl SensorValues {
             let format_version = value[0];
 
             if value[0] == 3 {
-                let values = SensorValuesV3::try_from(value)?;
+                let values = SensorValuesV3::try_from(&value[1..])?;
                 Ok(Self::from(values))
             } else {
                 Err(ParseError::UnsupportedFormatVersion(format_version))
