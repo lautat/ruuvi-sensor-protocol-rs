@@ -43,19 +43,19 @@ impl SensorValues {
     /// # Ok::<(), ParseError>(())
     /// ```
     pub fn from_manufacturer_specific_data(id: u16, value: &[u8]) -> Result<Self, ParseError> {
-        if id == 0x0499 && value.len() > 0 {
-            let format_version = value[0];
+        match (id, value) {
+            (0x0499, []) => Err(ParseError::EmptyValue),
+            (0x0499, value) => {
+                let format_version = value[0];
 
-            if value[0] == 3 {
-                let values = SensorValuesV3::try_from(&value[1..])?;
-                Ok(Self::from(values))
-            } else {
-                Err(ParseError::UnsupportedFormatVersion(format_version))
+                if format_version == 3 {
+                    let values = SensorValuesV3::try_from(&value[1..])?;
+                    Ok(Self::from(values))
+                } else {
+                    Err(ParseError::UnsupportedFormatVersion(format_version))
+                }
             }
-        } else if value.len() == 0 {
-            Err(ParseError::EmptyValue)
-        } else {
-            Err(ParseError::UnknownManufacturerId(id))
+            (id, _) => Err(ParseError::UnknownManufacturerId(id)),
         }
     }
 }
