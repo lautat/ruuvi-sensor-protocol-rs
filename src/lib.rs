@@ -25,7 +25,8 @@ assert_eq!(result, Err(ParseError::UnsupportedFormatVersion(7)));
 A successful parse returns a `SensorValue` structure with a set of values.
 ```rust
 use ruuvi_sensor_protocol::{
-    Acceleration, AccelerationVector, Humidity, Pressure, SensorValues, Temperature
+    Acceleration, AccelerationVector, BatteryPotential, Humidity, Pressure, SensorValues,
+    Temperature,
 };
 # use ruuvi_sensor_protocol::ParseError;
 
@@ -39,7 +40,7 @@ assert_eq!(values.humidity_as_ppm(), Some(115_000));
 assert_eq!(values.temperature_as_millicelsius(), Some(1690));
 assert_eq!(values.pressure_as_pascals(), Some(63656));
 assert_eq!(values.acceleration_vector_as_milli_g(), Some(AccelerationVector(1000, 1255, 1510)));
-assert_eq!(values.battery_potential, Some(2182));
+assert_eq!(values.battery_potential_as_millivolts(), Some(2182));
 # Ok::<(), ParseError>(())
 ```
 
@@ -65,6 +66,11 @@ pub trait Acceleration {
     /// Returns a three-dimensional acceleration vector where each component is in milli-G if an
     /// acceleration measurement is available.
     fn acceleration_vector_as_milli_g(&self) -> Option<AccelerationVector>;
+}
+
+pub trait BatteryPotential {
+    /// Returns battery potential as milli-volts
+    fn battery_potential_as_millivolts(&self) -> Option<u16>;
 }
 
 pub trait Temperature {

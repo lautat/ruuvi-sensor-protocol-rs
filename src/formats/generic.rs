@@ -1,7 +1,7 @@
 use core::convert::TryFrom;
 
 use crate::{
-    formats::v3::SensorValuesV3, Acceleration, AccelerationVector, Humidity, ParseError,
+    formats::v3::SensorValuesV3, Acceleration, AccelerationVector, BatteryPotential, Humidity, ParseError,
     Pressure, Temperature,
 };
 
@@ -16,8 +16,8 @@ pub struct SensorValues {
     pressure: Option<u32>,
     /// 3-dimensional acceleration vector, each component is in milli-G
     acceleration: Option<AccelerationVector>,
-    /// battery potential in millivolts
-    pub battery_potential: Option<u16>,
+    /// battery potential in milli-volts
+    battery_potential: Option<u16>,
 }
 
 impl SensorValues {
@@ -64,6 +64,12 @@ impl Acceleration for SensorValues {
     }
 }
 
+impl BatteryPotential for SensorValues {
+    fn battery_potential_as_millivolts(&self) -> Option<u16> {
+        self.battery_potential
+    }
+}
+
 impl Humidity for SensorValues {
     fn humidity_as_ppm(&self) -> Option<u32> {
         self.humidity
@@ -89,7 +95,7 @@ impl From<SensorValuesV3> for SensorValues {
             temperature: values.temperature_as_millikelvins(),
             pressure: values.pressure_as_pascals(),
             acceleration: values.acceleration_vector_as_milli_g(),
-            battery_potential: Some(values.battery_potential),
+            battery_potential: values.battery_potential_as_millivolts(),
         }
     }
 }

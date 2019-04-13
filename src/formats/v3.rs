@@ -1,6 +1,6 @@
 use core::convert::TryFrom;
 
-use crate::{Acceleration, AccelerationVector, Humidity, ParseError, Pressure, Temperature};
+use crate::{Acceleration, AccelerationVector, BatteryPotential, Humidity, ParseError, Pressure, Temperature};
 
 const PROTOCOL_VERSION: u8 = 3;
 const EXPECTED_VALUE_LENGTH: usize = 14;
@@ -11,12 +11,18 @@ pub struct SensorValuesV3 {
     temperature: u16,
     pressure: u16,
     acceleration: AccelerationVector,
-    pub battery_potential: u16,
+    battery_potential: u16,
 }
 
 impl Acceleration for SensorValuesV3 {
     fn acceleration_vector_as_milli_g(&self) -> Option<AccelerationVector> {
         Some(self.acceleration)
+    }
+}
+
+impl BatteryPotential for SensorValuesV3 {
+    fn battery_potential_as_millivolts(&self) -> Option<u16> {
+        Some(self.battery_potential)
     }
 }
 
