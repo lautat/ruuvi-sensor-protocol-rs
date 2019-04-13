@@ -1,6 +1,6 @@
 use core::convert::TryFrom;
 
-use crate::{Acceleration, AccelerationVector, Humidity, ParseError, Temperature};
+use crate::{Acceleration, AccelerationVector, Humidity, ParseError, Pressure, Temperature};
 
 const PROTOCOL_VERSION: u8 = 3;
 const EXPECTED_VALUE_LENGTH: usize = 14;
@@ -12,12 +12,6 @@ pub struct SensorValuesV3 {
     pressure: u16,
     acceleration: AccelerationVector,
     pub battery_potential: u16,
-}
-
-impl SensorValuesV3 {
-    pub fn pressure_pascals(&self) -> u32 {
-        u32::from(self.pressure) + 50_000
-    }
 }
 
 impl Acceleration for SensorValuesV3 {
@@ -45,6 +39,12 @@ impl Temperature for SensorValuesV3 {
         };
 
         Some(temperature)
+    }
+}
+
+impl Pressure for SensorValuesV3 {
+    fn pressure_as_pascals(&self) -> Option<u32> {
+        Some(u32::from(self.pressure) + 50_000)
     }
 }
 
@@ -143,7 +143,7 @@ mod tests {
             0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.pressure_pascals(), 63656);
+        assert_eq!(result.pressure_as_pascals(), Some(63656));
     }
 
     #[test]
