@@ -1,8 +1,8 @@
 use core::convert::TryFrom;
 
 use crate::{
-    formats::v3::SensorValuesV3, Acceleration, AccelerationVector, BatteryPotential, Humidity, ParseError,
-    Pressure, Temperature,
+    formats::v3::SensorValuesV3, Acceleration, AccelerationVector, BatteryPotential, Humidity,
+    ParseError, Pressure, Temperature,
 };
 
 /// Represents a set of values read from sensors on the device
@@ -48,7 +48,7 @@ impl SensorValues {
 
                 if format_version == 3 {
                     let values = SensorValuesV3::try_from(&value[1..])?;
-                    Ok(Self::from(values))
+                    Ok(Self::from(&values))
                 } else {
                     Err(ParseError::UnsupportedFormatVersion(format_version))
                 }
@@ -88,8 +88,11 @@ impl Pressure for SensorValues {
     }
 }
 
-impl From<SensorValuesV3> for SensorValues {
-    fn from(values: SensorValuesV3) -> SensorValues {
+impl<T> From<&T> for SensorValues
+where
+    T: Acceleration + BatteryPotential + Humidity + Temperature + Pressure,
+{
+    fn from(values: &T) -> SensorValues {
         SensorValues {
             humidity: values.humidity_as_ppm(),
             temperature: values.temperature_as_millikelvins(),

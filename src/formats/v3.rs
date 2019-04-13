@@ -1,6 +1,8 @@
 use core::convert::TryFrom;
 
-use crate::{Acceleration, AccelerationVector, BatteryPotential, Humidity, ParseError, Pressure, Temperature};
+use crate::{
+    Acceleration, AccelerationVector, BatteryPotential, Humidity, ParseError, Pressure, Temperature,
+};
 
 const PROTOCOL_VERSION: u8 = 3;
 const EXPECTED_VALUE_LENGTH: usize = 14;
