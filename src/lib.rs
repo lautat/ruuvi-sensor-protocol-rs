@@ -54,10 +54,14 @@ pub use crate::formats::{AccelerationVector, ParseError, SensorValues};
 pub trait Temperature {
     const ZERO_CELSIUS_IN_MILLIKELVINS: u32 = 273_1500;
 
-    fn temperature_as_millikelvins(&self) -> u32;
+    /// Returns temperature in milli-kelvins if a temperature reading is available.
+    fn temperature_as_millikelvins(&self) -> Option<u32>;
 
-    fn temperature_as_millicelsius(&self) -> i32 {
-        self.temperature_as_millikelvins() as i32 - Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32
+    /// Returns temperature in milli-Celsius if a temperature reading is available.
+    fn temperature_as_millicelsius(&self) -> Option<i32> {
+        self.temperature_as_millikelvins().map(|temperature| {
+            temperature as i32 - Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32
+        })
     }
 }
 
@@ -66,11 +70,11 @@ mod tests {
 
     #[allow(dead_code)]
     struct Value {
-        temperature: u32
+        temperature: Option<u32>
     }
 
     impl Temperature for Value {
-        fn temperature_as_millikelvins(&self) -> u32 {
+        fn temperature_as_millikelvins(&self) -> Option<u32> {
             self.temperature
         }
     }
@@ -85,8 +89,9 @@ mod tests {
         }
     }
 
-    test_kelvins_to_celcius_conversion!(zero_kelvins, 0, -273_1500);
-    test_kelvins_to_celcius_conversion!(zero_celsius, 273_1500, 0);
-    test_kelvins_to_celcius_conversion!(sub_zero_celsius_1, 263_0800, -10_0700);
-    test_kelvins_to_celcius_conversion!(sub_zero_celsius_2, 194_9240, -78_2260);
+    test_kelvins_to_celcius_conversion!(zero_kelvins, Some(0), Some(-273_1500));
+    test_kelvins_to_celcius_conversion!(zero_celsius, Some(273_1500), Some(0));
+    test_kelvins_to_celcius_conversion!(sub_zero_celsius_1, Some(263_0800), Some(-10_0700));
+    test_kelvins_to_celcius_conversion!(sub_zero_celsius_2, Some(194_9240), Some(-78_2260));
+    test_kelvins_to_celcius_conversion!(no_temperature, None, None);
 }
