@@ -50,3 +50,41 @@ See [`SensorValues`](struct.SensorValues.html) documentation for a description o
 mod formats;
 
 pub use crate::formats::{AccelerationVector, ParseError, SensorValues};
+
+pub trait Temperature {
+    fn temperature_as_millikelvins(&self) -> u32;
+
+    fn temperature_as_millicelsius(&self) -> i32 {
+        self.temperature_as_millikelvins() as i32 - 273_1500
+    }
+}
+
+mod tests {
+    use super::*;
+
+    #[allow(dead_code)]
+    struct Value {
+        temperature: u32
+    }
+
+    impl Temperature for Value {
+        fn temperature_as_millikelvins(&self) -> u32 {
+            self.temperature
+        }
+    }
+
+    macro_rules! test_kelvins_to_celcius_conversion {
+        ($name: ident, $milli_kelvins: expr, $milli_celsius: expr) => {
+            #[test]
+            fn $name() {
+                let value = Value { temperature: $milli_kelvins };
+                assert_eq!(value.temperature_as_millicelsius(), $milli_celsius);
+            }
+        }
+    }
+
+    test_kelvins_to_celcius_conversion!(zero_kelvins, 0, -273_1500);
+    test_kelvins_to_celcius_conversion!(zero_celsius, 273_1500, 0);
+    test_kelvins_to_celcius_conversion!(sub_zero_celsius_1, 263_0800, -10_0700);
+    test_kelvins_to_celcius_conversion!(sub_zero_celsius_2, 194_9240, -78_2260);
+}
