@@ -24,7 +24,9 @@ assert_eq!(result, Err(ParseError::UnsupportedFormatVersion(7)));
 
 A successful parse returns a `SensorValue` structure with a set of values.
 ```rust
-use ruuvi_sensor_protocol::{AccelerationVector, Humidity, SensorValues, Temperature};
+use ruuvi_sensor_protocol::{
+    Acceleration, AccelerationVector, Humidity, SensorValues, Temperature
+};
 # use ruuvi_sensor_protocol::ParseError;
 
 let id = 0x0499;
@@ -36,7 +38,7 @@ let values = SensorValues::from_manufacturer_specific_data(id, value)?;
 assert_eq!(values.humidity_as_ppm(), Some(115_000));
 assert_eq!(values.temperature_as_millicelsius(), Some(1690));
 assert_eq!(values.pressure, Some(63656));
-assert_eq!(values.acceleration, Some(AccelerationVector(1000, 1255, 1510)));
+assert_eq!(values.acceleration_vector_as_milli_g(), Some(AccelerationVector(1000, 1255, 1510)));
 assert_eq!(values.battery_potential, Some(2182));
 # Ok::<(), ParseError>(())
 ```
@@ -56,8 +58,14 @@ use std::error::Error;
 pub use crate::formats::SensorValues;
 
 /// a 3-dimensional vector which represents acceleration of each dimension in milli-G
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct AccelerationVector(pub i16, pub i16, pub i16);
+
+pub trait Acceleration {
+    /// Returns a three-dimensional acceleration vector where each component is in milli-G if an
+    /// acceleration measurement is available.
+    fn acceleration_vector_as_milli_g(&self) -> Option<AccelerationVector>;
+}
 
 pub trait Temperature {
     const ZERO_CELSIUS_IN_MILLIKELVINS: u32 = 273_1500;
