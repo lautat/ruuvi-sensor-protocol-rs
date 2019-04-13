@@ -2,14 +2,14 @@ use core::convert::TryFrom;
 
 use crate::{
     formats::v3::{AccelerationVectorV3, SensorValuesV3},
-    ParseError, Temperature,
+    Humidity, ParseError, Temperature,
 };
 
 /// Represents a set of values read from sensors on the device
 #[derive(Debug, PartialEq)]
 pub struct SensorValues {
     /// humidity in parts per million
-    pub humidity: Option<u32>,
+    humidity: Option<u32>,
     /// temperature in milli-kelvins
     temperature: Option<u32>,
     /// pressure in pascals
@@ -58,6 +58,12 @@ impl SensorValues {
     }
 }
 
+impl Humidity for SensorValues {
+    fn humidity_as_ppm(&self) -> Option<u32> {
+        self.humidity
+    }
+}
+
 impl Temperature for SensorValues {
     fn temperature_as_millikelvins(&self) -> Option<u32> {
         self.temperature
@@ -69,7 +75,7 @@ impl From<SensorValuesV3> for SensorValues {
         let AccelerationVectorV3(ref a_x, ref a_y, ref a_z) = values.acceleration;
 
         SensorValues {
-            humidity: Some(values.humidity_ppm()),
+            humidity: values.humidity_as_ppm(),
             temperature: values.temperature_as_millikelvins(),
             pressure: Some(values.pressure_pascals()),
             acceleration: Some(AccelerationVector(*a_x, *a_y, *a_z)),

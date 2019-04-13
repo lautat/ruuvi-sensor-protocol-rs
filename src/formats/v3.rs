@@ -1,6 +1,6 @@
 use core::convert::TryFrom;
 
-use crate::{ParseError, Temperature};
+use crate::{Humidity, ParseError, Temperature};
 
 const PROTOCOL_VERSION: u8 = 3;
 const EXPECTED_VALUE_LENGTH: usize = 14;
@@ -18,9 +18,11 @@ impl SensorValuesV3 {
     pub fn pressure_pascals(&self) -> u32 {
         u32::from(self.pressure) + 50_000
     }
+}
 
-    pub fn humidity_ppm(&self) -> u32 {
-        u32::from(self.humidity) * 5_000
+impl Humidity for SensorValuesV3 {
+    fn humidity_as_ppm(&self) -> Option<u32> {
+        Some(u32::from(self.humidity) * 5_000)
     }
 }
 
@@ -147,7 +149,7 @@ mod tests {
             0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.humidity_ppm(), 115_000);
+        assert_eq!(result.humidity_as_ppm(), Some(115_000));
     }
 
     #[test]

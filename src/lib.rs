@@ -24,7 +24,7 @@ assert_eq!(result, Err(ParseError::UnsupportedFormatVersion(7)));
 
 A successful parse returns a `SensorValue` structure with a set of values.
 ```rust
-use ruuvi_sensor_protocol::{AccelerationVector, SensorValues, Temperature};
+use ruuvi_sensor_protocol::{AccelerationVector, Humidity, SensorValues, Temperature};
 # use ruuvi_sensor_protocol::ParseError;
 
 let id = 0x0499;
@@ -33,7 +33,7 @@ let value = &[
 ];
 let values = SensorValues::from_manufacturer_specific_data(id, value)?;
 
-assert_eq!(values.humidity, Some(115_000));
+assert_eq!(values.humidity_as_ppm(), Some(115_000));
 assert_eq!(values.temperature_as_millicelsius(), Some(1690));
 assert_eq!(values.pressure, Some(63656));
 assert_eq!(values.acceleration, Some(AccelerationVector(1000, 1255, 1510)));
@@ -58,14 +58,19 @@ pub use crate::formats::{AccelerationVector, SensorValues};
 pub trait Temperature {
     const ZERO_CELSIUS_IN_MILLIKELVINS: u32 = 273_1500;
 
-    /// Returns temperature in milli-kelvins if a temperature reading is available.
+    /// Returns temperature as milli-kelvins if a temperature reading is available.
     fn temperature_as_millikelvins(&self) -> Option<u32>;
 
-    /// Returns temperature in milli-Celsius if a temperature reading is available.
+    /// Returns temperature as milli-Celsius if a temperature reading is available.
     fn temperature_as_millicelsius(&self) -> Option<i32> {
         self.temperature_as_millikelvins()
             .map(|temperature| temperature as i32 - Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32)
     }
+}
+
+pub trait Humidity {
+    /// Returns relative humidity as parts per million
+    fn humidity_as_ppm(&self) -> Option<u32>;
 }
 
 /// Errors which can occur during parsing of the manufacturer specific data
