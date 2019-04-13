@@ -1,11 +1,9 @@
-use core::{
-    convert::TryFrom,
-    fmt::{self, Display, Formatter},
-};
-#[cfg(feature = "std")]
-use std::error::Error;
+use core::convert::TryFrom;
 
-use crate::Temperature;
+use crate::{ParseError, Temperature};
+
+const PROTOCOL_VERSION: u8 = 3;
+const EXPECTED_VALUE_LENGTH: usize = 14;
 
 #[derive(Debug, PartialEq)]
 pub struct SensorValuesV3 {
@@ -43,7 +41,7 @@ impl Temperature for SensorValuesV3 {
 }
 
 impl TryFrom<&[u8]> for SensorValuesV3 {
-    type Error = InvalidValueLength;
+    type Error = ParseError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         match value {
@@ -60,7 +58,11 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
                     battery_potential: u16_from_two_bytes(*potential_1, *potential_2),
                 })
             }
-            _ => Err(InvalidValueLength(value.len() + 1)),
+            _ => Err(ParseError::InvalidValueLength(
+                PROTOCOL_VERSION,
+                value.len() + 1,
+                EXPECTED_VALUE_LENGTH,
+            )),
         }
     }
 }
@@ -76,23 +78,6 @@ fn i16_from_two_bytes(b1: u8, b2: u8) -> i16 {
     (i16::from(b1) << 8) | i16::from(b2)
 }
 
-#[derive(Debug, PartialEq)]
-pub struct InvalidValueLength(pub usize);
-
-impl Display for InvalidValueLength {
-    fn fmt(&self, formatter: &mut Formatter) -> Result<(), fmt::Error> {
-        let Self(ref length) = self;
-        write!(
-            formatter,
-            "Invalid data length of {} for format version 3, expected 14",
-            length
-        )
-    }
-}
-
-#[cfg(feature = "std")]
-impl Error for InvalidValueLength {}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -101,7 +86,14 @@ mod tests {
     fn parse_version_3_data_with_invalid_length() {
         let value: [u8; 5] = [103, 22, 50, 60, 70];
         let result = SensorValuesV3::try_from(&value[..]);
-        assert_eq!(result, Err(InvalidValueLength(6)));
+        assert_eq!(
+            result,
+            Err(ParseError::InvalidValueLength(
+                PROTOCOL_VERSION,
+                6,
+                EXPECTED_VALUE_LENGTH
+            ))
+        );
     }
 
     #[test]

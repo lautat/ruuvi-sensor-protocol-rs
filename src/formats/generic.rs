@@ -1,11 +1,9 @@
-use core::{
-    convert::TryFrom,
-    fmt::{self, Display, Formatter},
-};
-#[cfg(feature = "std")]
-use std::error::Error;
+use core::convert::TryFrom;
 
-use crate::{formats::v3::{AccelerationVectorV3, InvalidValueLength, SensorValuesV3}, Temperature};
+use crate::{
+    formats::v3::{AccelerationVectorV3, SensorValuesV3},
+    ParseError, Temperature,
+};
 
 /// Represents a set of values read from sensors on the device
 #[derive(Debug, PartialEq)]
@@ -84,54 +82,6 @@ impl From<SensorValuesV3> for SensorValues {
 #[derive(Debug, PartialEq)]
 pub struct AccelerationVector(pub i16, pub i16, pub i16);
 
-/// Errors which can occur during parsing of the manufacturer specific data
-#[derive(Debug, PartialEq)]
-pub enum ParseError {
-    /// Manufacturer id does not match expected value
-    UnknownManufacturerId(u16),
-    /// Format of the data is not supported by this crate
-    UnsupportedFormatVersion(u8),
-    /// Length of the value does not match expected length of the format
-    InvalidValueLength(InvalidValueLength),
-    /// Format can not be determined from value due to it being empty
-    EmptyValue,
-}
-
-impl Display for ParseError {
-    fn fmt(&self, formatter: &mut Formatter) -> Result<(), fmt::Error> {
-        match self {
-            ParseError::UnknownManufacturerId(id) => write!(
-                formatter,
-                "Unknown manufacturer id {:#04X}, only 0x0499 is supported",
-                id
-            ),
-            ParseError::UnsupportedFormatVersion(format_version) => write!(
-                formatter,
-                "Unsupported data format version {}, only version 3 is supported",
-                format_version
-            ),
-            ParseError::InvalidValueLength(inner) => write!(formatter, "{}", inner),
-            ParseError::EmptyValue => write!(formatter, "Empty value, expected at least one byte"),
-        }
-    }
-}
-
-impl From<InvalidValueLength> for ParseError {
-    fn from(error: InvalidValueLength) -> Self {
-        ParseError::InvalidValueLength(error)
-    }
-}
-
-#[cfg(feature = "std")]
-impl Error for ParseError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            ParseError::InvalidValueLength(ref inner) => Some(inner),
-            _ => None,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -170,7 +120,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
-            ParseError::InvalidValueLength(InvalidValueLength(6))
+            ParseError::InvalidValueLength(3, 6, 14)
         );
     }
 
