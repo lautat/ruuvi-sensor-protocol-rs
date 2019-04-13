@@ -5,7 +5,7 @@ use core::{
 #[cfg(feature = "std")]
 use std::error::Error;
 
-use crate::formats::v3::{AccelerationVectorV3, InvalidValueLength, SensorValuesV3};
+use crate::{formats::v3::{AccelerationVectorV3, InvalidValueLength, SensorValuesV3}, Temperature};
 
 /// Represents a set of values read from sensors on the device
 #[derive(Debug, PartialEq)]
@@ -66,7 +66,7 @@ impl From<SensorValuesV3> for SensorValues {
 
         SensorValues {
             humidity: Some(values.humidity_ppm()),
-            temperature: Some(values.temperature_millicelsius()),
+            temperature: Some(values.temperature_as_millicelsius()),
             pressure: Some(values.pressure_pascals()),
             acceleration: Some(AccelerationVector(*a_x, *a_y, *a_z)),
             battery_potential: Some(values.battery_potential),

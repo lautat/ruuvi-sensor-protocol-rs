@@ -5,6 +5,8 @@ use core::{
 #[cfg(feature = "std")]
 use std::error::Error;
 
+use crate::Temperature;
+
 #[derive(Debug, PartialEq)]
 pub struct SensorValuesV3 {
     humidity: u8,
@@ -15,20 +17,26 @@ pub struct SensorValuesV3 {
 }
 
 impl SensorValuesV3 {
-    pub fn temperature_millicelsius(&self) -> i32 {
-        let sign = i32::from(self.temperature >> 15) * -2 + 1;
-        let integer_part = i32::from((self.temperature >> 8) & 0x7F);
-        let decimal_part = i32::from(self.temperature & 0xFF);
-
-        sign * (integer_part * 1000 + decimal_part * 10)
-    }
-
     pub fn pressure_pascals(&self) -> u32 {
         u32::from(self.pressure) + 50_000
     }
 
     pub fn humidity_ppm(&self) -> u32 {
         u32::from(self.humidity) * 5_000
+    }
+}
+
+impl Temperature for SensorValuesV3 {
+    fn temperature_as_millikelvins(&self) -> u32 {
+        let integer_part = u32::from((self.temperature >> 8) & 0x7F);
+        let decimal_part = u32::from(self.temperature & 0xFF);
+        let absolute_value = integer_part * 1000 + decimal_part * 10;
+
+        if self.temperature >> 15 == 0 {
+            Self::ZERO_CELSIUS_IN_MILLIKELVINS + absolute_value
+        } else {
+            Self::ZERO_CELSIUS_IN_MILLIKELVINS - absolute_value
+        }
     }
 }
 
@@ -118,7 +126,7 @@ mod tests {
             0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.temperature_millicelsius(), 1690);
+        assert_eq!(result.temperature_as_millicelsius(), 1690);
     }
 
     #[test]
@@ -127,7 +135,7 @@ mod tests {
             0x17, 0x81, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.temperature_millicelsius(), -1690);
+        assert_eq!(result.temperature_as_millicelsius(), -1690);
     }
 
     #[test]

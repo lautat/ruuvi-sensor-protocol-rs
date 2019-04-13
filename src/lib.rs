@@ -52,10 +52,12 @@ mod formats;
 pub use crate::formats::{AccelerationVector, ParseError, SensorValues};
 
 pub trait Temperature {
+    const ZERO_CELSIUS_IN_MILLIKELVINS: u32 = 273_1500;
+
     fn temperature_as_millikelvins(&self) -> u32;
 
     fn temperature_as_millicelsius(&self) -> i32 {
-        self.temperature_as_millikelvins() as i32 - 273_1500
+        self.temperature_as_millikelvins() as i32 - Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32
     }
 }
 
