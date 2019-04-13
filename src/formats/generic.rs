@@ -12,8 +12,8 @@ use crate::{formats::v3::{AccelerationVectorV3, InvalidValueLength, SensorValues
 pub struct SensorValues {
     /// humidity in parts per million
     pub humidity: Option<u32>,
-    /// temperature in millicelsius
-    pub temperature: Option<i32>,
+    /// temperature in milli-kelvins
+    temperature: Option<u32>,
     /// pressure in pascals
     pub pressure: Option<u32>,
     /// 3-dimensional acceleration vector, each component is in milli-G
@@ -31,7 +31,7 @@ impl SensorValues {
     /// # Examples
     ///
     /// ```rust
-    /// use ruuvi_sensor_protocol::SensorValues;
+    /// use ruuvi_sensor_protocol::{SensorValues, Temperature};
     /// # use ruuvi_sensor_protocol::ParseError;
     ///
     /// let id = 0x0499;
@@ -39,7 +39,7 @@ impl SensorValues {
     ///     0x03, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
     /// ];
     /// let values = SensorValues::from_manufacturer_specific_data(id, value)?;
-    /// assert_eq!(values.temperature, Some(1690));
+    /// assert_eq!(values.temperature_as_millicelsius(), Some(1690));
     /// # Ok::<(), ParseError>(())
     /// ```
     pub fn from_manufacturer_specific_data(id: u16, value: &[u8]) -> Result<Self, ParseError> {
@@ -60,13 +60,19 @@ impl SensorValues {
     }
 }
 
+impl Temperature for SensorValues {
+    fn temperature_as_millikelvins(&self) -> Option<u32> {
+        self.temperature
+    }
+}
+
 impl From<SensorValuesV3> for SensorValues {
     fn from(values: SensorValuesV3) -> SensorValues {
         let AccelerationVectorV3(ref a_x, ref a_y, ref a_z) = values.acceleration;
 
         SensorValues {
             humidity: Some(values.humidity_ppm()),
-            temperature: values.temperature_as_millicelsius(),
+            temperature: values.temperature_as_millikelvins(),
             pressure: Some(values.pressure_pascals()),
             acceleration: Some(AccelerationVector(*a_x, *a_y, *a_z)),
             battery_potential: Some(values.battery_potential),
@@ -179,7 +185,7 @@ mod tests {
             result,
             Ok(SensorValues {
                 humidity: Some(115_000),
-                temperature: Some(1690),
+                temperature: Some(1690 + 273_1500),
                 pressure: Some(63656),
                 acceleration: Some(AccelerationVector(1000, 1255, 1510)),
                 battery_potential: Some(2182)

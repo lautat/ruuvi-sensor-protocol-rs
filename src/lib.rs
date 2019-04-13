@@ -24,7 +24,7 @@ assert_eq!(result, Err(ParseError::UnsupportedFormatVersion(7)));
 
 A successful parse returns a `SensorValue` structure with a set of values.
 ```rust
-use ruuvi_sensor_protocol::{AccelerationVector, SensorValues};
+use ruuvi_sensor_protocol::{AccelerationVector, SensorValues, Temperature};
 # use ruuvi_sensor_protocol::ParseError;
 
 let id = 0x0499;
@@ -34,7 +34,7 @@ let value = &[
 let values = SensorValues::from_manufacturer_specific_data(id, value)?;
 
 assert_eq!(values.humidity, Some(115_000));
-assert_eq!(values.temperature, Some(1690));
+assert_eq!(values.temperature_as_millicelsius(), Some(1690));
 assert_eq!(values.pressure, Some(63656));
 assert_eq!(values.acceleration, Some(AccelerationVector(1000, 1255, 1510)));
 assert_eq!(values.battery_potential, Some(2182));
