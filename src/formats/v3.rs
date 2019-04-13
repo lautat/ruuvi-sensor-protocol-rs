@@ -1,6 +1,6 @@
 use core::convert::TryFrom;
 
-use crate::{Humidity, ParseError, Temperature};
+use crate::{AccelerationVector, Humidity, ParseError, Temperature};
 
 const PROTOCOL_VERSION: u8 = 3;
 const EXPECTED_VALUE_LENGTH: usize = 14;
@@ -10,7 +10,7 @@ pub struct SensorValuesV3 {
     humidity: u8,
     temperature: u16,
     pressure: u16,
-    pub acceleration: AccelerationVectorV3,
+    pub acceleration: AccelerationVector,
     pub battery_potential: u16,
 }
 
@@ -52,7 +52,7 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
                     humidity: *humidity,
                     temperature: u16_from_two_bytes(*temperature_1, *temperature_2),
                     pressure: u16_from_two_bytes(*pressure_1, *pressure_2),
-                    acceleration: AccelerationVectorV3(
+                    acceleration: AccelerationVector(
                         i16_from_two_bytes(*acceleration_x_1, *acceleration_x_2),
                         i16_from_two_bytes(*acceleration_y_1, *acceleration_y_2),
                         i16_from_two_bytes(*acceleration_z_1, *acceleration_z_2),
@@ -68,9 +68,6 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
         }
     }
 }
-
-#[derive(Debug, PartialEq)]
-pub struct AccelerationVectorV3(pub i16, pub i16, pub i16);
 
 fn u16_from_two_bytes(b1: u8, b2: u8) -> u16 {
     (u16::from(b1) << 8) | u16::from(b2)
@@ -110,7 +107,7 @@ mod tests {
                 humidity: 0x17,
                 temperature: 0x0145,
                 pressure: 0x3558,
-                acceleration: AccelerationVectorV3(1000, 1255, 1510),
+                acceleration: AccelerationVector(1000, 1255, 1510),
                 battery_potential: 0x0886
             })
         );
@@ -158,7 +155,7 @@ mod tests {
             0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.acceleration, AccelerationVectorV3(1000, 1255, 1510));
+        assert_eq!(result.acceleration, AccelerationVector(1000, 1255, 1510));
     }
 
     #[test]
@@ -169,7 +166,7 @@ mod tests {
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
         assert_eq!(
             result.acceleration,
-            AccelerationVectorV3(-1000, -1255, -1510)
+            AccelerationVector(-1000, -1255, -1510)
         );
     }
 

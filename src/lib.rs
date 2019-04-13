@@ -53,7 +53,11 @@ use core::fmt::{self, Display, Formatter};
 #[cfg(feature = "std")]
 use std::error::Error;
 
-pub use crate::formats::{AccelerationVector, SensorValues};
+pub use crate::formats::SensorValues;
+
+/// a 3-dimensional vector which represents acceleration of each dimension in milli-G
+#[derive(Debug, PartialEq)]
+pub struct AccelerationVector(pub i16, pub i16, pub i16);
 
 pub trait Temperature {
     const ZERO_CELSIUS_IN_MILLIKELVINS: u32 = 273_1500;
