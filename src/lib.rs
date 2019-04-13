@@ -154,5 +154,7 @@ mod tests {
     test_kelvins_to_celcius_conversion!(zero_celsius, Some(273_1500), Some(0));
     test_kelvins_to_celcius_conversion!(sub_zero_celsius_1, Some(263_0800), Some(-10_0700));
     test_kelvins_to_celcius_conversion!(sub_zero_celsius_2, Some(194_9240), Some(-78_2260));
+    test_kelvins_to_celcius_conversion!(above_zero_celsius_1, Some(4343_9340), Some(4070_7840));
+    test_kelvins_to_celcius_conversion!(above_zero_celsius_2, Some(291_6550), Some(18_5050));
     test_kelvins_to_celcius_conversion!(no_temperature, None, None);
 }
