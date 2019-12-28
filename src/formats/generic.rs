@@ -1,8 +1,9 @@
 use core::convert::TryFrom;
 
 use crate::{
-    formats::v3::SensorValuesV3, Acceleration, AccelerationVector, BatteryPotential, Humidity,
-    ParseError, Pressure, Temperature,
+    formats::v3::SensorValuesV3, formats::v5::SensorValuesV5, Acceleration, AccelerationVector,
+    BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber, MovementCounter, ParseError,
+    Pressure, Temperature, TransmitterPower,
 };
 
 /// Represents a set of values read from sensors on the device
@@ -18,13 +19,21 @@ pub struct SensorValues {
     acceleration: Option<AccelerationVector>,
     /// battery potential in milli-volts
     battery_potential: Option<u16>,
+    /// transmitter power in dBm
+    tx_power: Option<i8>,
+    /// movement counter
+    movement_counter: Option<u32>,
+    /// measurement sequence number
+    measurement_sequence_number: Option<u32>,
+    /// MAC address
+    mac_address: Option<[u8; 6]>,
 }
 
 impl SensorValues {
     /// Parses sensor values from the payload encoded in manufacturer specific data -field. The
     /// function returns a `ParseError` if the `id` does not match the exptected `id` in the
     /// manufacturer specific data, or the format of the `value` is not supported. At the moment
-    /// only version 3 of the format is supported.
+    /// only versions 3 and 5 of the format are supported.
     ///
     /// # Examples
     ///
@@ -46,11 +55,16 @@ impl SensorValues {
             (0x0499, value) => {
                 let format_version = value[0];
 
-                if format_version == 3 {
-                    let values = SensorValuesV3::try_from(&value[1..])?;
-                    Ok(Self::from(&values))
-                } else {
-                    Err(ParseError::UnsupportedFormatVersion(format_version))
+                match format_version {
+                    3 => {
+                        let values = SensorValuesV3::try_from(&value[1..])?;
+                        Ok(Self::from(&values))
+                    }
+                    5 => {
+                        let values = SensorValuesV5::try_from(&value[1..])?;
+                        Ok(Self::from(&values))
+                    }
+                    _ => Err(ParseError::UnsupportedFormatVersion(format_version)),
                 }
             }
             (id, _) => Err(ParseError::UnknownManufacturerId(id)),
@@ -67,6 +81,12 @@ impl Acceleration for SensorValues {
 impl BatteryPotential for SensorValues {
     fn battery_potential_as_millivolts(&self) -> Option<u16> {
         self.battery_potential
+    }
+}
+
+impl TransmitterPower for SensorValues {
+    fn tx_power_as_dbm(&self) -> Option<i8> {
+        self.tx_power
     }
 }
 
@@ -88,9 +108,35 @@ impl Pressure for SensorValues {
     }
 }
 
+impl MovementCounter for SensorValues {
+    fn movement_counter(&self) -> Option<u32> {
+        self.movement_counter
+    }
+}
+
+impl MeasurementSequenceNumber for SensorValues {
+    fn measurement_sequence_number(&self) -> Option<u32> {
+        self.measurement_sequence_number
+    }
+}
+
+impl MacAddress for SensorValues {
+    fn mac_address(&self) -> Option<[u8; 6]> {
+        self.mac_address
+    }
+}
+
 impl<T> From<&T> for SensorValues
 where
-    T: Acceleration + BatteryPotential + Humidity + Temperature + Pressure,
+    T: Acceleration
+        + BatteryPotential
+        + TransmitterPower
+        + Humidity
+        + Temperature
+        + Pressure
+        + MovementCounter
+        + MeasurementSequenceNumber
+        + MacAddress,
 {
     fn from(values: &T) -> SensorValues {
         SensorValues {
@@ -99,6 +145,10 @@ where
             pressure: values.pressure_as_pascals(),
             acceleration: values.acceleration_vector_as_milli_g(),
             battery_potential: values.battery_potential_as_millivolts(),
+            tx_power: values.tx_power_as_dbm(),
+            movement_counter: values.movement_counter(),
+            measurement_sequence_number: values.measurement_sequence_number(),
+            mac_address: values.mac_address(),
         }
     }
 }
@@ -159,7 +209,47 @@ mod tests {
                 temperature: Some(1690 + 273_1500),
                 pressure: Some(63656),
                 acceleration: Some(AccelerationVector(1000, 1255, 1510)),
-                battery_potential: Some(2182)
+                battery_potential: Some(2182),
+                tx_power: None,
+                movement_counter: None,
+                measurement_sequence_number: None,
+                mac_address: None,
+            })
+        );
+    }
+
+    #[test]
+    fn parse_version_5_data_with_invalid_length() {
+        let value = [0x05, 0x12, 0xFC, 0x53];
+        let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
+
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            ParseError::InvalidValueLength(5, 4, 24)
+        );
+    }
+
+    #[test]
+    fn parse_valid_version_5_data() {
+        let value = [
+            0x05, 0x12, 0xFC, 0x53, 0x94, 0xC3, 0x7C, 0x00, 0x04, 0xFF, 0xFC, 0x04, 0x0C, 0xAC,
+            0x36, 0x42, 0x00, 0xCD, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
+        ];
+        let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
+
+        assert_eq!(
+            result,
+            Ok(SensorValues {
+                humidity: Some(534_900),
+                temperature: Some(24_300 + 273_1500),
+                pressure: Some(100_044),
+                acceleration: Some(AccelerationVector(4, -4, 1036)),
+                battery_potential: Some(2977),
+                tx_power: Some(4),
+                movement_counter: Some(66),
+                measurement_sequence_number: Some(205),
+                mac_address: Some([0xcb, 0xb8, 0x33, 0x4c, 0x88, 0x4f]),
             })
         );
     }

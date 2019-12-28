@@ -73,6 +73,11 @@ pub trait BatteryPotential {
     fn battery_potential_as_millivolts(&self) -> Option<u16>;
 }
 
+pub trait TransmitterPower {
+    /// Returns transmitter power as dBm if available.
+    fn tx_power_as_dbm(&self) -> Option<i8>;
+}
+
 pub trait Temperature {
     const ZERO_CELSIUS_IN_MILLIKELVINS: u32 = 273_1500;
 
@@ -94,6 +99,21 @@ pub trait Humidity {
 pub trait Pressure {
     /// Returns pressure as pascals
     fn pressure_as_pascals(&self) -> Option<u32>;
+}
+
+pub trait MovementCounter {
+    /// Returns the movement count of the tag if available. The maximum value is not specified.
+    fn movement_counter(&self) -> Option<u32>;
+}
+
+pub trait MeasurementSequenceNumber {
+    /// Returns the measurement sequence number if available. The maximum value is not specified.
+    fn measurement_sequence_number(&self) -> Option<u32>;
+}
+
+pub trait MacAddress {
+    /// Returns the MAC address of the sensor if available.
+    fn mac_address(&self) -> Option<[u8; 6]>;
 }
 
 /// Errors which can occur during parsing of the manufacturer specific data
