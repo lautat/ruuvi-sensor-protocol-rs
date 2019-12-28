@@ -16,6 +16,9 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ## Changes
 
+### `0.5.0`
+- Add support for [data format 5 (RAWv2)](https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_05.md).
+
 ### `0.4.0`
 - Requires Rust `>= 1.34`
 
