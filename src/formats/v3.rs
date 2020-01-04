@@ -1,7 +1,10 @@
 use core::convert::TryFrom;
 
 use crate::{
-    Acceleration, AccelerationVector, BatteryPotential, Humidity, ParseError, Pressure, Temperature,
+    formats::util::{i16_from_two_bytes, u16_from_two_bytes},
+    Acceleration, AccelerationVector, BatteryPotential, Humidity, MacAddress,
+    MeasurementSequenceNumber, MovementCounter, ParseError, Pressure, Temperature,
+    TransmitterPower,
 };
 
 const PROTOCOL_VERSION: u8 = 3;
@@ -25,6 +28,12 @@ impl Acceleration for SensorValuesV3 {
 impl BatteryPotential for SensorValuesV3 {
     fn battery_potential_as_millivolts(&self) -> Option<u16> {
         Some(self.battery_potential)
+    }
+}
+
+impl TransmitterPower for SensorValuesV3 {
+    fn tx_power_as_dbm(&self) -> Option<i8> {
+        None
     }
 }
 
@@ -56,6 +65,24 @@ impl Pressure for SensorValuesV3 {
     }
 }
 
+impl MovementCounter for SensorValuesV3 {
+    fn movement_counter(&self) -> Option<u32> {
+        None
+    }
+}
+
+impl MeasurementSequenceNumber for SensorValuesV3 {
+    fn measurement_sequence_number(&self) -> Option<u32> {
+        None
+    }
+}
+
+impl MacAddress for SensorValuesV3 {
+    fn mac_address(&self) -> Option<[u8; 6]> {
+        None
+    }
+}
+
 impl TryFrom<&[u8]> for SensorValuesV3 {
     type Error = ParseError;
 
@@ -81,14 +108,6 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
             )),
         }
     }
-}
-
-fn u16_from_two_bytes(b1: u8, b2: u8) -> u16 {
-    (u16::from(b1) << 8) | u16::from(b2)
-}
-
-fn i16_from_two_bytes(b1: u8, b2: u8) -> i16 {
-    (i16::from(b1) << 8) | i16::from(b2)
 }
 
 #[cfg(test)]
@@ -188,5 +207,41 @@ mod tests {
         ];
         let result = SensorValuesV3::try_from(&value[..]).unwrap();
         assert_eq!(result.battery_potential, 2182);
+    }
+
+    #[test]
+    fn tx_power_not_set() {
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
+        ];
+        let result = SensorValuesV3::try_from(&value[..]).unwrap();
+        assert_eq!(result.tx_power_as_dbm(), None);
+    }
+
+    #[test]
+    fn movement_counter_not_set() {
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
+        ];
+        let result = SensorValuesV3::try_from(&value[..]).unwrap();
+        assert_eq!(result.movement_counter(), None);
+    }
+
+    #[test]
+    fn measurement_sequence_number_not_set() {
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
+        ];
+        let result = SensorValuesV3::try_from(&value[..]).unwrap();
+        assert_eq!(result.measurement_sequence_number(), None);
+    }
+
+    #[test]
+    fn mac_address_not_set() {
+        let value: [u8; 13] = [
+            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
+        ];
+        let result = SensorValuesV3::try_from(&value[..]).unwrap();
+        assert_eq!(result.mac_address(), None);
     }
 }
