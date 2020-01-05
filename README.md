@@ -16,6 +16,9 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ## Changes
 
+### `0.4.1`
+- Corrected `ZERO_CELCIUS_IN_MILLIKELVINS` constant
+
 ### `0.4.0`
 - Requires Rust `>= 1.34`
 - Add support for [data format 5 (RAWv2)](https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_05.md).

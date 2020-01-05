@@ -206,7 +206,7 @@ mod tests {
             result,
             Ok(SensorValues {
                 humidity: Some(115_000),
-                temperature: Some(1690 + 273_1500),
+                temperature: Some(1690 + 273_150),
                 pressure: Some(63656),
                 acceleration: Some(AccelerationVector(1000, 1255, 1510)),
                 battery_potential: Some(2182),
@@ -242,7 +242,7 @@ mod tests {
             result,
             Ok(SensorValues {
                 humidity: Some(534_900),
-                temperature: Some(24_300 + 273_1500),
+                temperature: Some(24_300 + 273_150),
                 pressure: Some(100_044),
                 acceleration: Some(AccelerationVector(4, -4, 1036)),
                 battery_potential: Some(2977),

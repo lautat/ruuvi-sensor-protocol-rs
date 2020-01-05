@@ -79,7 +79,7 @@ pub trait TransmitterPower {
 }
 
 pub trait Temperature {
-    const ZERO_CELSIUS_IN_MILLIKELVINS: u32 = 273_1500;
+    const ZERO_CELSIUS_IN_MILLIKELVINS: u32 = 273_150;
 
     /// Returns temperature as milli-kelvins if a temperature reading is available.
     fn temperature_as_millikelvins(&self) -> Option<u32>;
@@ -181,11 +181,11 @@ mod tests {
         };
     }
 
-    test_kelvins_to_celcius_conversion!(zero_kelvins, Some(0), Some(-273_1500));
-    test_kelvins_to_celcius_conversion!(zero_celsius, Some(273_1500), Some(0));
-    test_kelvins_to_celcius_conversion!(sub_zero_celsius_1, Some(263_0800), Some(-10_0700));
-    test_kelvins_to_celcius_conversion!(sub_zero_celsius_2, Some(194_9240), Some(-78_2260));
-    test_kelvins_to_celcius_conversion!(above_zero_celsius_1, Some(4343_9340), Some(4070_7840));
-    test_kelvins_to_celcius_conversion!(above_zero_celsius_2, Some(291_6550), Some(18_5050));
+    test_kelvins_to_celcius_conversion!(zero_kelvins, Some(0), Some(-273_150));
+    test_kelvins_to_celcius_conversion!(zero_celsius, Some(273_150), Some(0));
+    test_kelvins_to_celcius_conversion!(sub_zero_celsius_1, Some(263_080), Some(-10_070));
+    test_kelvins_to_celcius_conversion!(sub_zero_celsius_2, Some(194_924), Some(-78_226));
+    test_kelvins_to_celcius_conversion!(above_zero_celsius_1, Some(4343_934), Some(4070_784));
+    test_kelvins_to_celcius_conversion!(above_zero_celsius_2, Some(291_655), Some(18_505));
     test_kelvins_to_celcius_conversion!(no_temperature, None, None);
 }

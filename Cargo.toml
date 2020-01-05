@@ -1,6 +1,6 @@
 [package]
 name = "ruuvi-sensor-protocol"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Atte Lautanala <atte.lautanala@gmail.com>", "Henrik Lievonen <github@hli.fi>"]
 edition = "2018"
 description = "Ruuvi sensor protocol parser implementation"
