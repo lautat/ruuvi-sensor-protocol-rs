@@ -22,7 +22,7 @@ let result = SensorValues::from_manufacturer_specific_data(id, value);
 assert_eq!(result, Err(ParseError::UnsupportedFormatVersion(7)));
 ```
 
-A successful parse returns a `SensorValue` structure with a set of values.
+A successful parse returns a [`SensorValues`] structure with a set of values.
 ```rust
 use ruuvi_sensor_protocol::{
     Acceleration, AccelerationVector, BatteryPotential, Humidity, Pressure, SensorValues,
@@ -44,8 +44,9 @@ assert_eq!(values.battery_potential_as_millivolts(), Some(2182));
 # Ok::<(), ParseError>(())
 ```
 
-See [`SensorValues`](struct.SensorValues.html) documentation for a description of each value.
+See [`SensorValues`] documentation for a description of each value.
 
+[`SensorValues`]: crate::SensorValues
 */
 
 #![cfg_attr(not(feature = "std"), no_std)]
