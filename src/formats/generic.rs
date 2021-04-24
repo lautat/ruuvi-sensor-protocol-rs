@@ -51,22 +51,16 @@ impl SensorValues {
     /// ```
     pub fn from_manufacturer_specific_data(id: u16, value: &[u8]) -> Result<Self, ParseError> {
         match (id, value) {
-            (0x0499, []) => Err(ParseError::EmptyValue),
-            (0x0499, value) => {
-                let format_version = value[0];
-
-                match format_version {
-                    3 => {
-                        let values = SensorValuesV3::try_from(&value[1..])?;
-                        Ok(Self::from(&values))
-                    }
-                    5 => {
-                        let values = SensorValuesV5::try_from(&value[1..])?;
-                        Ok(Self::from(&values))
-                    }
-                    _ => Err(ParseError::UnsupportedFormatVersion(format_version)),
-                }
+            (0x0499, [3, data @ ..]) => {
+                let values = SensorValuesV3::try_from(data)?;
+                Ok(Self::from(&values))
             }
+            (0x0499, [5, data @ ..]) => {
+                let values = SensorValuesV5::try_from(data)?;
+                Ok(Self::from(&values))
+            }
+            (0x0499, [version, ..]) => Err(ParseError::UnsupportedFormatVersion(*version)),
+            (0x0499, []) => Err(ParseError::EmptyValue),
             (id, _) => Err(ParseError::UnknownManufacturerId(id)),
         }
     }
