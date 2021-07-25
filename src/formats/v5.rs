@@ -1,7 +1,6 @@
 use core::convert::TryFrom;
 
 use crate::{
-    formats::util::{i16_from_two_bytes, u16_from_two_bytes},
     Acceleration, AccelerationVector, BatteryPotential, Humidity, MacAddress,
     MeasurementSequenceNumber, MovementCounter, ParseError, Pressure, Temperature,
     TransmitterPower,
@@ -128,19 +127,19 @@ impl TryFrom<&[u8]> for SensorValuesV5 {
         match value {
             [temperature_1, temperature_2, humidity_1, humidity_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, power_1, power_2, movement_counter, measurement_sequence_number_1, measurement_sequence_number_2, mac_1, mac_2, mac_3, mac_4, mac_5, mac_6] => {
                 Ok(Self {
-                    temperature: i16_from_two_bytes(*temperature_1, *temperature_2),
-                    humidity: u16_from_two_bytes(*humidity_1, *humidity_2),
-                    pressure: u16_from_two_bytes(*pressure_1, *pressure_2),
+                    temperature: i16::from_be_bytes([*temperature_1, *temperature_2]),
+                    humidity: u16::from_be_bytes([*humidity_1, *humidity_2]),
+                    pressure: u16::from_be_bytes([*pressure_1, *pressure_2]),
                     acceleration: [
-                        i16_from_two_bytes(*acceleration_x_1, *acceleration_x_2),
-                        i16_from_two_bytes(*acceleration_y_1, *acceleration_y_2),
-                        i16_from_two_bytes(*acceleration_z_1, *acceleration_z_2),
+                        i16::from_be_bytes([*acceleration_x_1, *acceleration_x_2]),
+                        i16::from_be_bytes([*acceleration_y_1, *acceleration_y_2]),
+                        i16::from_be_bytes([*acceleration_z_1, *acceleration_z_2]),
                     ],
-                    power_info: u16_from_two_bytes(*power_1, *power_2),
+                    power_info: u16::from_be_bytes([*power_1, *power_2]),
                     movement_counter: *movement_counter,
-                    measurement_sequence_number: u16_from_two_bytes(
-                        *measurement_sequence_number_1,
-                        *measurement_sequence_number_2,
+                    measurement_sequence_number: u16::from_be_bytes(
+                        [*measurement_sequence_number_1,
+                        *measurement_sequence_number_2,]
                     ),
                     mac_address: [*mac_1, *mac_2, *mac_3, *mac_4, *mac_5, *mac_6],
                 })

@@ -1,7 +1,6 @@
 use core::convert::TryFrom;
 
 use crate::{
-    formats::util::{i16_from_two_bytes, u16_from_two_bytes},
     Acceleration, AccelerationVector, BatteryPotential, Humidity, MacAddress,
     MeasurementSequenceNumber, MovementCounter, ParseError, Pressure, Temperature,
     TransmitterPower,
@@ -91,14 +90,14 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
             [humidity, temperature_1, temperature_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, potential_1, potential_2] => {
                 Ok(Self {
                     humidity: *humidity,
-                    temperature: u16_from_two_bytes(*temperature_1, *temperature_2),
-                    pressure: u16_from_two_bytes(*pressure_1, *pressure_2),
+                    temperature: u16::from_be_bytes([*temperature_1, *temperature_2]),
+                    pressure: u16::from_be_bytes([*pressure_1, *pressure_2]),
                     acceleration: AccelerationVector(
-                        i16_from_two_bytes(*acceleration_x_1, *acceleration_x_2),
-                        i16_from_two_bytes(*acceleration_y_1, *acceleration_y_2),
-                        i16_from_two_bytes(*acceleration_z_1, *acceleration_z_2),
+                        i16::from_be_bytes([*acceleration_x_1, *acceleration_x_2]),
+                        i16::from_be_bytes([*acceleration_y_1, *acceleration_y_2]),
+                        i16::from_be_bytes([*acceleration_z_1, *acceleration_z_2]),
                     ),
-                    battery_potential: u16_from_two_bytes(*potential_1, *potential_2),
+                    battery_potential: u16::from_be_bytes([*potential_1, *potential_2]),
                 })
             }
             _ => Err(ParseError::InvalidValueLength(
