@@ -161,100 +161,98 @@ where
 mod tests {
     use super::*;
 
-    #[test]
-    fn parse_unsupported_manufacturer_id() {
-        let value = [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        let result = SensorValues::from_manufacturer_specific_data(0x0477, value);
-        assert!(result.is_err());
-        assert_eq!(
-            result.unwrap_err(),
-            ParseError::UnknownManufacturerId(0x0477)
-        );
+    macro_rules! test_parser {
+        (
+            name: $name: ident,
+            input: $input: expr,
+            result: $result: expr,
+        ) => {
+            test_parser! {
+                name: $name,
+                input_id: 0x0499,
+                input_value: $input,
+                result: $result,
+            }
+        };
+        (
+            name: $name: ident,
+            input_id: $id: expr,
+            input_value: $value: expr,
+            result: $result: expr,
+        ) => {
+            #[test]
+            fn $name() {
+                let result = SensorValues::from_manufacturer_specific_data($id, $value);
+                assert_eq!(result, $result);
+            }
+        };
     }
 
-    #[test]
-    fn parse_unsupported_format() {
-        let value = [0, 1, 2, 3];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), ParseError::UnsupportedFormatVersion(0));
+    test_parser! {
+        name: unsupported_manufacturer_id,
+        input_id: 0x0477,
+        input_value: [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        result: Err(ParseError::UnknownManufacturerId(0x0477)),
     }
 
-    #[test]
-    fn parse_empty_data() {
-        let value = [];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), ParseError::EmptyValue);
+    test_parser! {
+        name: unsupported_format,
+        input: [0, 1, 2, 3],
+        result: Err(ParseError::UnsupportedFormatVersion(0)),
     }
 
-    #[test]
-    fn parse_version_3_data_with_invalid_length() {
-        let value = [3, 103, 22, 50, 60, 70];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
-        assert!(result.is_err());
-        assert_eq!(
-            result.unwrap_err(),
-            ParseError::InvalidValueLength(3, 6, 14)
-        );
+    test_parser! {
+        name: empty_data,
+        input: [],
+        result: Err(ParseError::EmptyValue),
     }
 
-    #[test]
-    fn parse_valid_version_3_data() {
-        let value = [
+    test_parser! {
+        name: version_3_data_with_invalid_length,
+        input: [3, 103, 22, 50, 60, 70],
+        result: Err(ParseError::InvalidValueLength(3, 6, 14)),
+    }
+
+    test_parser! {
+        name: valid_version_3_data,
+        input: [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
-        ];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
-
-        assert_eq!(
-            result,
-            Ok(SensorValues {
-                humidity: Some(115_000),
-                temperature: Some(1690 + 273_150),
-                pressure: Some(63656),
-                acceleration: Some(AccelerationVector(1000, 1255, 1510)),
-                battery_potential: Some(2182),
-                tx_power: None,
-                movement_counter: None,
-                measurement_sequence_number: None,
-                mac_address: None,
-            })
-        );
+        ],
+        result: Ok(SensorValues {
+            humidity: Some(115_000),
+            temperature: Some(1690 + 273_150),
+            pressure: Some(63656),
+            acceleration: Some(AccelerationVector(1000, 1255, 1510)),
+            battery_potential: Some(2182),
+            tx_power: None,
+            movement_counter: None,
+            measurement_sequence_number: None,
+            mac_address: None,
+        }),
     }
 
-    #[test]
-    fn parse_version_5_data_with_invalid_length() {
-        let value = [0x05, 0x12, 0xFC, 0x53];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
-
-        assert!(result.is_err());
-        assert_eq!(
-            result.unwrap_err(),
-            ParseError::InvalidValueLength(5, 4, 24)
-        );
+    test_parser! {
+        name: version_5_data_with_invalid_length,
+        input: [0x05, 0x12, 0xFC, 0x53],
+        result: Err(ParseError::InvalidValueLength(5, 4, 24)),
     }
 
-    #[test]
-    fn parse_valid_version_5_data() {
-        let value = [
+    test_parser! {
+        name: valid_version_5_data,
+        input: [
             0x05, 0x12, 0xFC, 0x53, 0x94, 0xC3, 0x7C, 0x00, 0x04, 0xFF, 0xFC, 0x04, 0x0C, 0xAC,
             0x36, 0x42, 0x00, 0xCD, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
-        ];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
-
-        assert_eq!(
-            result,
-            Ok(SensorValues {
-                humidity: Some(534_900),
-                temperature: Some(24_300 + 273_150),
-                pressure: Some(100_044),
-                acceleration: Some(AccelerationVector(4, -4, 1036)),
-                battery_potential: Some(2977),
-                tx_power: Some(4),
-                movement_counter: Some(66),
-                measurement_sequence_number: Some(205),
-                mac_address: Some([0xcb, 0xb8, 0x33, 0x4c, 0x88, 0x4f]),
-            })
-        );
+        ],
+        result: Ok(SensorValues {
+            humidity: Some(534_900),
+            temperature: Some(24_300 + 273_150),
+            pressure: Some(100_044),
+            acceleration: Some(AccelerationVector(4, -4, 1036)),
+            battery_potential: Some(2977),
+            tx_power: Some(4),
+            movement_counter: Some(66),
+            measurement_sequence_number: Some(205),
+            mac_address: Some([0xcb, 0xb8, 0x33, 0x4c, 0x88, 0x4f]),
+        }),
     }
 }
