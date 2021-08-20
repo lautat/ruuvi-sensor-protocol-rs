@@ -164,7 +164,7 @@ mod tests {
 
     // These test vectors are from the protocol specification
     // https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_05.md
-    const VALID_DATA: [u8; 23] = [
+    const VALID_VALUES: [u8; 23] = [
         0x12, 0xFC, 0x53, 0x94, 0xC3, 0x7C, 0x00, 0x04, 0xFF, 0xFC, 0x04, 0x0C, 0xAC, 0x36, 0x42,
         0x00, 0xCD, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
     ];
@@ -197,7 +197,7 @@ mod tests {
 
     #[test]
     fn parse_valid_version_5_data() {
-        let result = SensorValuesV5::try_from(&VALID_DATA[..]);
+        let result = SensorValuesV5::try_from(&VALID_VALUES[..]);
         assert_eq!(
             result,
             Ok(SensorValuesV5 {
@@ -213,142 +213,61 @@ mod tests {
         );
     }
 
-    macro_rules! test_conversions {
-        (
-            method_name: $method: ident,
-            valid_value: $value: expr,
-            min_value: $min: expr,
-            max_value: $max: expr,
-        ) => {
-            mod $method {
-                use super::*;
-
-                test_conversion! {
-                    name: conversion,
-                    method: $method,
-                    input: VALID_DATA,
-                    expected_value: $value,
-                }
-
-                test_conversion! {
-                    name: min_conversion,
-                    method: $method,
-                    input: MIN_VALUES,
-                    expected_value: $min,
-                }
-
-                test_conversion! {
-                    name: max_conversion,
-                    method: $method,
-                    input: MAX_VALUES,
-                    expected_value: $max,
-                }
-
-                test_conversion! {
-                    name: invalid_conversion,
-                    method: $method,
-                    input: INVALID_VALUES,
-                    expected_value: None,
-                }
-            }
-        };
-        (
-            method_name: $method: ident,
-            valid_value: $value: expr,
-        ) => {
-            mod $method {
-                use super::*;
-
-                test_conversion! {
-                    name: conversion,
-                    method: $method,
-                    input: VALID_DATA,
-                    expected_value: $value,
-                }
-
-                test_conversion! {
-                    name: invalid_conversion,
-                    method: $method,
-                    input: INVALID_VALUES,
-                    expected_value: None,
-                }
-            }
-        };
+    crate::test_conversion_methods! {
+        name: valid_values,
+        type_: SensorValuesV5,
+        input: VALID_VALUES,
+        acceleration_vector_as_milli_g: Some(AccelerationVector(4, -4, 1_036)),
+        battery_potential_as_millivolts: Some(2_977),
+        humidity_as_ppm: Some(534_900),
+        mac_address: Some([0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F]),
+        measurement_sequence_number: Some(205),
+        movement_counter: Some(66),
+        pressure_as_pascals: Some(100_044),
+        temperature_as_millicelsius: Some(24_300),
+        tx_power_as_dbm: Some(4),
     }
 
-    macro_rules! test_conversion {
-        (
-            name: $name: ident,
-            method: $method: ident,
-            input: $input: ident,
-            expected_value: $expected: expr,
-        ) => {
-            #[test]
-            fn $name() {
-                let result = SensorValuesV5::try_from(&$input[..]).unwrap();
-                assert_eq!(result.$method(), $expected);
-            }
-        };
+    crate::test_conversion_methods! {
+        name: invalid_values,
+        type_: SensorValuesV5,
+        input: INVALID_VALUES,
+        acceleration_vector_as_milli_g: None,
+        battery_potential_as_millivolts: None,
+        humidity_as_ppm: None,
+        mac_address: None,
+        measurement_sequence_number: None,
+        movement_counter: None,
+        pressure_as_pascals: None,
+        temperature_as_millicelsius: None,
+        tx_power_as_dbm: None,
     }
 
-    test_conversions! {
-        method_name: acceleration_vector_as_milli_g,
-        valid_value: Some(AccelerationVector(4, -4, 1_036)),
-        min_value: Some(AccelerationVector(-32_767, -32_767, -32_767)),
-        max_value: Some(AccelerationVector(32_767, 32_767, 32_767)),
+    crate::test_conversion_methods! {
+        name: min_values,
+        type_: SensorValuesV5,
+        input: MIN_VALUES,
+        acceleration_vector_as_milli_g: Some(AccelerationVector(-32_767, -32_767, -32_767)),
+        battery_potential_as_millivolts: Some(1_600),
+        humidity_as_ppm: Some(0),
+        measurement_sequence_number: Some(0),
+        movement_counter: Some(0),
+        pressure_as_pascals: Some(50_000),
+        temperature_as_millicelsius: Some(-163_835),
+        tx_power_as_dbm: Some(-40),
     }
 
-    test_conversions! {
-        method_name: battery_potential_as_millivolts,
-        valid_value: Some(2_977),
-        min_value: Some(1_600),
-        max_value: Some(3_646),
-    }
-
-    test_conversions! {
-        method_name: humidity_as_ppm,
-        valid_value: Some(534_900),
-        min_value: Some(0),
-        max_value: Some(1_638_350),
-    }
-
-    test_conversions! {
-        method_name: mac_address,
-        valid_value: Some([0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F]),
-    }
-
-    test_conversions! {
-        method_name: measurement_sequence_number,
-        valid_value: Some(205),
-        min_value: Some(0),
-        max_value: Some(65_534),
-    }
-
-    test_conversions! {
-        method_name: movement_counter,
-        valid_value: Some(66),
-        min_value: Some(0),
-        max_value: Some(254),
-    }
-
-    test_conversions! {
-        method_name: pressure_as_pascals,
-        valid_value: Some(100_044),
-        min_value: Some(50_000),
-        max_value: Some(115_534),
-    }
-
-    test_conversions! {
-        method_name: temperature_as_millicelsius,
-        valid_value: Some(24_300),
-        min_value: Some(-163_835),
-        max_value: Some(163_835),
-    }
-
-    test_conversions! {
-        method_name: tx_power_as_dbm,
-        valid_value: Some(4),
-        min_value: Some(-40),
-        max_value: Some(20),
+    crate::test_conversion_methods! {
+        name: max_values,
+        type_: SensorValuesV5,
+        input: MAX_VALUES,
+        acceleration_vector_as_milli_g: Some(AccelerationVector(32_767, 32_767, 32_767)),
+        battery_potential_as_millivolts: Some(3_646),
+        humidity_as_ppm: Some(1_638_350),
+        measurement_sequence_number: Some(65_534),
+        movement_counter: Some(254),
+        pressure_as_pascals: Some(115_534),
+        temperature_as_millicelsius: Some(163_835),
+        tx_power_as_dbm: Some(20),
     }
 }
