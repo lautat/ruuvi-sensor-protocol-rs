@@ -213,7 +213,7 @@ mod tests {
         );
     }
 
-    crate::test_conversion_methods! {
+    crate::test_measurement_trait_methods! {
         name: valid_values,
         type_: SensorValuesV5,
         input: VALID_VALUES,
@@ -228,7 +228,7 @@ mod tests {
         tx_power_as_dbm: Some(4),
     }
 
-    crate::test_conversion_methods! {
+    crate::test_measurement_trait_methods! {
         name: invalid_values,
         type_: SensorValuesV5,
         input: INVALID_VALUES,
@@ -243,7 +243,7 @@ mod tests {
         tx_power_as_dbm: None,
     }
 
-    crate::test_conversion_methods! {
+    crate::test_measurement_trait_methods! {
         name: min_values,
         type_: SensorValuesV5,
         input: MIN_VALUES,
@@ -257,7 +257,7 @@ mod tests {
         tx_power_as_dbm: Some(-40),
     }
 
-    crate::test_conversion_methods! {
+    crate::test_measurement_trait_methods! {
         name: max_values,
         type_: SensorValuesV5,
         input: MAX_VALUES,

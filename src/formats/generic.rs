@@ -207,36 +207,36 @@ mod tests {
         result: Err(ParseError::EmptyValue),
     }
 
-    test_parser! {
-        name: version_3_data_with_invalid_length,
-        input: [3, 103, 22, 50, 60, 70],
-        result: Err(ParseError::InvalidValueLength(3, 6, 14)),
-    }
-
-    const VALID_V3_INPUT: [u8; 14] = [
-        3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
-    ];
-
-    test_parser! {
-        name: valid_version_3_data,
-        input: VALID_V3_INPUT,
-        result: Ok(SensorValues {
-            acceleration: Some(AccelerationVector(1000, 1255, 1510)),
-            battery_potential: Some(2182),
-            humidity: Some(115_000),
-            mac_address: None,
-            measurement_sequence_number: None,
-            movement_counter: None,
-            pressure: Some(63656),
-            temperature: Some(1690 + 273_150),
-            tx_power: None,
-        }),
-    }
-
     mod v3 {
         use super::*;
 
-        crate::test_conversion_methods! {
+        test_parser! {
+            name: input_with_invalid_length,
+            input: [3, 103, 22, 50, 60, 70],
+            result: Err(ParseError::InvalidValueLength(3, 6, 14)),
+        }
+
+        const VALID_V3_INPUT: [u8; 14] = [
+            3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+        ];
+
+        test_parser! {
+            name: valid_input,
+            input: VALID_V3_INPUT,
+            result: Ok(SensorValues {
+                acceleration: Some(AccelerationVector(1000, 1255, 1510)),
+                battery_potential: Some(2182),
+                humidity: Some(115_000),
+                mac_address: None,
+                measurement_sequence_number: None,
+                movement_counter: None,
+                pressure: Some(63656),
+                temperature: Some(1690 + 273_150),
+                tx_power: None,
+            }),
+        }
+
+        crate::test_measurement_trait_methods! {
             values: SensorValues::from_manufacturer_specific_data(0x0499, VALID_V3_INPUT).unwrap(),
             acceleration_vector_as_milli_g: Some(AccelerationVector(1000, 1255, 1510)),
             battery_potential_as_millivolts: Some(2182),
@@ -251,37 +251,37 @@ mod tests {
         }
     }
 
-    test_parser! {
-        name: version_5_data_with_invalid_length,
-        input: [0x05, 0x12, 0xFC, 0x53],
-        result: Err(ParseError::InvalidValueLength(5, 4, 24)),
-    }
-
-    const VALID_V5_INPUT: [u8; 24] = [
-        0x05, 0x12, 0xFC, 0x53, 0x94, 0xC3, 0x7C, 0x00, 0x04, 0xFF, 0xFC, 0x04, 0x0C, 0xAC,
-        0x36, 0x42, 0x00, 0xCD, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
-    ];
-
-    test_parser! {
-        name: valid_version_5_data,
-        input: VALID_V5_INPUT,
-        result: Ok(SensorValues {
-            acceleration: Some(AccelerationVector(4, -4, 1036)),
-            battery_potential: Some(2977),
-            humidity: Some(534_900),
-            mac_address: Some([0xcb, 0xb8, 0x33, 0x4c, 0x88, 0x4f]),
-            measurement_sequence_number: Some(205),
-            movement_counter: Some(66),
-            pressure: Some(100_044),
-            temperature: Some(24_300 + 273_150),
-            tx_power: Some(4),
-        }),
-    }
-
     mod v5 {
         use super::*;
 
-        crate::test_conversion_methods! {
+        test_parser! {
+            name: input_with_invalid_length,
+            input: [0x05, 0x12, 0xFC, 0x53],
+            result: Err(ParseError::InvalidValueLength(5, 4, 24)),
+        }
+
+        const VALID_V5_INPUT: [u8; 24] = [
+            0x05, 0x12, 0xFC, 0x53, 0x94, 0xC3, 0x7C, 0x00, 0x04, 0xFF, 0xFC, 0x04, 0x0C, 0xAC,
+            0x36, 0x42, 0x00, 0xCD, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
+        ];
+
+        test_parser! {
+            name: valid_input,
+            input: VALID_V5_INPUT,
+            result: Ok(SensorValues {
+                acceleration: Some(AccelerationVector(4, -4, 1036)),
+                battery_potential: Some(2977),
+                humidity: Some(534_900),
+                mac_address: Some([0xcb, 0xb8, 0x33, 0x4c, 0x88, 0x4f]),
+                measurement_sequence_number: Some(205),
+                movement_counter: Some(66),
+                pressure: Some(100_044),
+                temperature: Some(24_300 + 273_150),
+                tx_power: Some(4),
+            }),
+        }
+
+        crate::test_measurement_trait_methods! {
             values: SensorValues::from_manufacturer_specific_data(0x0499, VALID_V5_INPUT).unwrap(),
             acceleration_vector_as_milli_g: Some(AccelerationVector(4, -4, 1036)),
             battery_potential_as_millivolts: Some(2977),

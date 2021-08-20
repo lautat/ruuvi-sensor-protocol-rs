@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! test_conversion_methods {
+macro_rules! test_measurement_trait_methods {
     (
         name: $name: ident,
         type_: $type: ty,
@@ -9,7 +9,7 @@ macro_rules! test_conversion_methods {
         mod $name {
             use super::*;
 
-            $crate::test_conversion_methods! {
+            $crate::test_measurement_trait_methods! {
                 type_: $type,
                 input: $input,
                 $($method: $result),+,
@@ -21,7 +21,7 @@ macro_rules! test_conversion_methods {
         input: $input: expr,
         $($method: ident: $result: expr),+,
     ) => {
-        $crate::test_conversion_methods! {
+        $crate::test_measurement_trait_methods! {
             values: {
                 let value: &[u8] = $input.as_ref();
                 <$type>::try_from(value).unwrap()
@@ -34,7 +34,7 @@ macro_rules! test_conversion_methods {
         $($method: ident: $result: expr),+,
     ) => {
         $(
-            $crate::test_conversion_method! {
+            $crate::test_measurement_trait_method! {
                 name: $method,
                 values: $values,
                 method: $method,
@@ -45,7 +45,7 @@ macro_rules! test_conversion_methods {
 }
 
 #[macro_export]
-macro_rules! test_conversion_method {
+macro_rules! test_measurement_trait_method {
     (
         name: $name: ident,
         values: $values: expr,

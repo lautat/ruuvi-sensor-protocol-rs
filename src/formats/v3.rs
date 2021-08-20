@@ -172,7 +172,7 @@ mod tests {
         }),
     }
 
-    crate::test_conversion_methods! {
+    crate::test_measurement_trait_methods! {
         type_: SensorValuesV3,
         input: INPUT,
         acceleration_vector_as_milli_g: Some(AccelerationVector(1000, 1255, 1510)),
@@ -186,7 +186,7 @@ mod tests {
         tx_power_as_dbm: None,
     }
 
-    crate::test_conversion_methods! {
+    crate::test_measurement_trait_methods! {
         name: negative_inputs,
         type_: SensorValuesV3,
         input: NEGATIVE_INPUT,
