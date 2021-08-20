@@ -49,15 +49,15 @@ impl SensorValues {
     /// # use ruuvi_sensor_protocol::ParseError;
     ///
     /// let id = 0x0499;
-    /// let value = &[
+    /// let value = [
     ///     0x03, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
     /// ];
     /// let values = SensorValues::from_manufacturer_specific_data(id, value)?;
     /// assert_eq!(values.temperature_as_millicelsius(), Some(1690));
     /// # Ok::<(), ParseError>(())
     /// ```
-    pub fn from_manufacturer_specific_data(id: u16, value: &[u8]) -> Result<Self, ParseError> {
-        match (id, value) {
+    pub fn from_manufacturer_specific_data(id: u16, value: impl AsRef<[u8]>) -> Result<Self, ParseError> {
+        match (id, value.as_ref()) {
             (0x0499, [3, data @ ..]) => {
                 let values = SensorValuesV3::try_from(data)?;
                 Ok(Self::from(&values))
@@ -85,39 +85,9 @@ impl BatteryPotential for SensorValues {
     }
 }
 
-impl TransmitterPower for SensorValues {
-    fn tx_power_as_dbm(&self) -> Option<i8> {
-        self.tx_power
-    }
-}
-
 impl Humidity for SensorValues {
     fn humidity_as_ppm(&self) -> Option<u32> {
         self.humidity
-    }
-}
-
-impl Temperature for SensorValues {
-    fn temperature_as_millikelvins(&self) -> Option<u32> {
-        self.temperature
-    }
-}
-
-impl Pressure for SensorValues {
-    fn pressure_as_pascals(&self) -> Option<u32> {
-        self.pressure
-    }
-}
-
-impl MovementCounter for SensorValues {
-    fn movement_counter(&self) -> Option<u32> {
-        self.movement_counter
-    }
-}
-
-impl MeasurementSequenceNumber for SensorValues {
-    fn measurement_sequence_number(&self) -> Option<u32> {
-        self.measurement_sequence_number
     }
 }
 
@@ -127,17 +97,47 @@ impl MacAddress for SensorValues {
     }
 }
 
+impl MeasurementSequenceNumber for SensorValues {
+    fn measurement_sequence_number(&self) -> Option<u32> {
+        self.measurement_sequence_number
+    }
+}
+
+impl MovementCounter for SensorValues {
+    fn movement_counter(&self) -> Option<u32> {
+        self.movement_counter
+    }
+}
+
+impl Pressure for SensorValues {
+    fn pressure_as_pascals(&self) -> Option<u32> {
+        self.pressure
+    }
+}
+
+impl Temperature for SensorValues {
+    fn temperature_as_millikelvins(&self) -> Option<u32> {
+        self.temperature
+    }
+}
+
+impl TransmitterPower for SensorValues {
+    fn tx_power_as_dbm(&self) -> Option<i8> {
+        self.tx_power
+    }
+}
+
 impl<T> From<&T> for SensorValues
 where
     T: Acceleration
         + BatteryPotential
-        + TransmitterPower
         + Humidity
-        + Temperature
-        + Pressure
-        + MovementCounter
+        + MacAddress
         + MeasurementSequenceNumber
-        + MacAddress,
+        + MovementCounter
+        + Pressure
+        + Temperature
+        + TransmitterPower,
 {
     fn from(values: &T) -> SensorValues {
         SensorValues {
@@ -161,7 +161,7 @@ mod tests {
     #[test]
     fn parse_unsupported_manufacturer_id() {
         let value = [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        let result = SensorValues::from_manufacturer_specific_data(0x0477, &value);
+        let result = SensorValues::from_manufacturer_specific_data(0x0477, value);
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
@@ -172,7 +172,7 @@ mod tests {
     #[test]
     fn parse_unsupported_format() {
         let value = [0, 1, 2, 3];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
+        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), ParseError::UnsupportedFormatVersion(0));
     }
@@ -180,7 +180,7 @@ mod tests {
     #[test]
     fn parse_empty_data() {
         let value = [];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
+        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), ParseError::EmptyValue);
     }
@@ -188,7 +188,7 @@ mod tests {
     #[test]
     fn parse_version_3_data_with_invalid_length() {
         let value = [3, 103, 22, 50, 60, 70];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
+        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
@@ -201,7 +201,7 @@ mod tests {
         let value = [
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
+        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
 
         assert_eq!(
             result,
@@ -222,7 +222,7 @@ mod tests {
     #[test]
     fn parse_version_5_data_with_invalid_length() {
         let value = [0x05, 0x12, 0xFC, 0x53];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
+        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
 
         assert!(result.is_err());
         assert_eq!(
@@ -237,7 +237,7 @@ mod tests {
             0x05, 0x12, 0xFC, 0x53, 0x94, 0xC3, 0x7C, 0x00, 0x04, 0xFF, 0xFC, 0x04, 0x0C, 0xAC,
             0x36, 0x42, 0x00, 0xCD, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
         ];
-        let result = SensorValues::from_manufacturer_specific_data(0x0499, &value);
+        let result = SensorValues::from_manufacturer_specific_data(0x0499, value);
 
         assert_eq!(
             result,

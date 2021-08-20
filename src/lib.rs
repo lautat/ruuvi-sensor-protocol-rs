@@ -15,7 +15,7 @@ invalid data in value field.
 use ruuvi_sensor_protocol::{ParseError, SensorValues};
 
 let id = 0x0499;
-let value = &[
+let value = [
     0x07, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
 ];
 let result = SensorValues::from_manufacturer_specific_data(id, value);
@@ -31,7 +31,7 @@ use ruuvi_sensor_protocol::{
 # use ruuvi_sensor_protocol::ParseError;
 
 let id = 0x0499;
-let value = &[
+let value = [
     0x03, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
 ];
 let values = SensorValues::from_manufacturer_specific_data(id, value)?;

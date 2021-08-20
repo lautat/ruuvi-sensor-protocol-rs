@@ -19,6 +19,7 @@ from source with `cargo doc`. Examples are included in the docs.
 ### `0.5.0` (unreleased)
 - Requires Rust `>= 1.48`
 - Adds `Clone` trait for `SensorValues` and `ParseError`
+- Use `AsRef<[u8]>` as type bound for value in `from_manufacturer_specific_data`
 
 ### `0.4.1`
 - Corrected `ZERO_CELCIUS_IN_MILLIKELVINS` constant
