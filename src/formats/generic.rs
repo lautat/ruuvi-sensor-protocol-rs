@@ -144,15 +144,15 @@ where
 {
     fn from(values: &T) -> SensorValues {
         SensorValues {
-            humidity: values.humidity_as_ppm(),
-            temperature: values.temperature_as_millikelvins(),
-            pressure: values.pressure_as_pascals(),
             acceleration: values.acceleration_vector_as_milli_g(),
             battery_potential: values.battery_potential_as_millivolts(),
-            tx_power: values.tx_power_as_dbm(),
-            movement_counter: values.movement_counter(),
-            measurement_sequence_number: values.measurement_sequence_number(),
+            humidity: values.humidity_as_ppm(),
             mac_address: values.mac_address(),
+            measurement_sequence_number: values.measurement_sequence_number(),
+            movement_counter: values.movement_counter(),
+            pressure: values.pressure_as_pascals(),
+            temperature: values.temperature_as_millikelvins(),
+            tx_power: values.tx_power_as_dbm(),
         }
     }
 }
@@ -219,15 +219,15 @@ mod tests {
             3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
         ],
         result: Ok(SensorValues {
-            humidity: Some(115_000),
-            temperature: Some(1690 + 273_150),
-            pressure: Some(63656),
             acceleration: Some(AccelerationVector(1000, 1255, 1510)),
             battery_potential: Some(2182),
-            tx_power: None,
-            movement_counter: None,
-            measurement_sequence_number: None,
+            humidity: Some(115_000),
             mac_address: None,
+            measurement_sequence_number: None,
+            movement_counter: None,
+            pressure: Some(63656),
+            temperature: Some(1690 + 273_150),
+            tx_power: None,
         }),
     }
 
@@ -244,15 +244,15 @@ mod tests {
             0x36, 0x42, 0x00, 0xCD, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
         ],
         result: Ok(SensorValues {
-            humidity: Some(534_900),
-            temperature: Some(24_300 + 273_150),
-            pressure: Some(100_044),
             acceleration: Some(AccelerationVector(4, -4, 1036)),
             battery_potential: Some(2977),
-            tx_power: Some(4),
-            movement_counter: Some(66),
-            measurement_sequence_number: Some(205),
+            humidity: Some(534_900),
             mac_address: Some([0xcb, 0xb8, 0x33, 0x4c, 0x88, 0x4f]),
+            measurement_sequence_number: Some(205),
+            movement_counter: Some(66),
+            pressure: Some(100_044),
+            temperature: Some(24_300 + 273_150),
+            tx_power: Some(4),
         }),
     }
 }

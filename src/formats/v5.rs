@@ -52,21 +52,50 @@ impl BatteryPotential for SensorValuesV5 {
     }
 }
 
-impl TransmitterPower for SensorValuesV5 {
-    fn tx_power_as_dbm(&self) -> Option<i8> {
-        let raw_value = (self.power_info & 0x1F) as i8;
-        if raw_value != 31 {
-            Some(raw_value * 2 - 40)
+impl Humidity for SensorValuesV5 {
+    fn humidity_as_ppm(&self) -> Option<u32> {
+        if self.humidity != 0xFFFF {
+            Some(u32::from(self.humidity) * 25)
         } else {
             None
         }
     }
 }
 
-impl Humidity for SensorValuesV5 {
-    fn humidity_as_ppm(&self) -> Option<u32> {
-        if self.humidity != 0xFFFF {
-            Some(u32::from(self.humidity) * 25)
+impl MacAddress for SensorValuesV5 {
+    fn mac_address(&self) -> Option<[u8; 6]> {
+        if self.mac_address != [0xFF; 6] {
+            Some(self.mac_address)
+        } else {
+            None
+        }
+    }
+}
+
+impl MeasurementSequenceNumber for SensorValuesV5 {
+    fn measurement_sequence_number(&self) -> Option<u32> {
+        if self.measurement_sequence_number != 0xFFFF {
+            Some(u32::from(self.measurement_sequence_number))
+        } else {
+            None
+        }
+    }
+}
+
+impl MovementCounter for SensorValuesV5 {
+    fn movement_counter(&self) -> Option<u32> {
+        if self.movement_counter != 0xFF {
+            Some(u32::from(self.movement_counter))
+        } else {
+            None
+        }
+    }
+}
+
+impl Pressure for SensorValuesV5 {
+    fn pressure_as_pascals(&self) -> Option<u32> {
+        if self.pressure != 0xFFFF {
+            Some(u32::from(self.pressure) + 50_000)
         } else {
             None
         }
@@ -85,40 +114,11 @@ impl Temperature for SensorValuesV5 {
     }
 }
 
-impl Pressure for SensorValuesV5 {
-    fn pressure_as_pascals(&self) -> Option<u32> {
-        if self.pressure != 0xFFFF {
-            Some(u32::from(self.pressure) + 50_000)
-        } else {
-            None
-        }
-    }
-}
-
-impl MovementCounter for SensorValuesV5 {
-    fn movement_counter(&self) -> Option<u32> {
-        if self.movement_counter != 0xFF {
-            Some(u32::from(self.movement_counter))
-        } else {
-            None
-        }
-    }
-}
-
-impl MeasurementSequenceNumber for SensorValuesV5 {
-    fn measurement_sequence_number(&self) -> Option<u32> {
-        if self.measurement_sequence_number != 0xFFFF {
-            Some(u32::from(self.measurement_sequence_number))
-        } else {
-            None
-        }
-    }
-}
-
-impl MacAddress for SensorValuesV5 {
-    fn mac_address(&self) -> Option<[u8; 6]> {
-        if self.mac_address != [0xFF; 6] {
-            Some(self.mac_address)
+impl TransmitterPower for SensorValuesV5 {
+    fn tx_power_as_dbm(&self) -> Option<i8> {
+        let raw_value = (self.power_info & 0x1F) as i8;
+        if raw_value != 31 {
+            Some(raw_value * 2 - 40)
         } else {
             None
         }

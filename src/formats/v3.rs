@@ -35,15 +35,33 @@ impl BatteryPotential for SensorValuesV3 {
     }
 }
 
-impl TransmitterPower for SensorValuesV3 {
-    fn tx_power_as_dbm(&self) -> Option<i8> {
+impl Humidity for SensorValuesV3 {
+    fn humidity_as_ppm(&self) -> Option<u32> {
+        Some(u32::from(self.humidity) * 5_000)
+    }
+}
+
+impl MacAddress for SensorValuesV3 {
+    fn mac_address(&self) -> Option<[u8; 6]> {
         None
     }
 }
 
-impl Humidity for SensorValuesV3 {
-    fn humidity_as_ppm(&self) -> Option<u32> {
-        Some(u32::from(self.humidity) * 5_000)
+impl MeasurementSequenceNumber for SensorValuesV3 {
+    fn measurement_sequence_number(&self) -> Option<u32> {
+        None
+    }
+}
+
+impl MovementCounter for SensorValuesV3 {
+    fn movement_counter(&self) -> Option<u32> {
+        None
+    }
+}
+
+impl Pressure for SensorValuesV3 {
+    fn pressure_as_pascals(&self) -> Option<u32> {
+        Some(u32::from(self.pressure) + 50_000)
     }
 }
 
@@ -63,26 +81,8 @@ impl Temperature for SensorValuesV3 {
     }
 }
 
-impl Pressure for SensorValuesV3 {
-    fn pressure_as_pascals(&self) -> Option<u32> {
-        Some(u32::from(self.pressure) + 50_000)
-    }
-}
-
-impl MovementCounter for SensorValuesV3 {
-    fn movement_counter(&self) -> Option<u32> {
-        None
-    }
-}
-
-impl MeasurementSequenceNumber for SensorValuesV3 {
-    fn measurement_sequence_number(&self) -> Option<u32> {
-        None
-    }
-}
-
-impl MacAddress for SensorValuesV3 {
-    fn mac_address(&self) -> Option<[u8; 6]> {
+impl TransmitterPower for SensorValuesV3 {
+    fn tx_power_as_dbm(&self) -> Option<i8> {
         None
     }
 }
