@@ -18,6 +18,7 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ### `0.5.0` (unreleased)
 - Requires Rust `>= 1.48`
+- Adds `Clone` trait for `SensorValues` and `ParseError`
 
 ### `0.4.1`
 - Corrected `ZERO_CELCIUS_IN_MILLIKELVINS` constant

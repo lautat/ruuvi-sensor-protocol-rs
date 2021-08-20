@@ -118,7 +118,7 @@ pub trait MacAddress {
 }
 
 /// Errors which can occur during parsing of the manufacturer specific data
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ParseError {
     /// Manufacturer id does not match expected value
     UnknownManufacturerId(u16),
