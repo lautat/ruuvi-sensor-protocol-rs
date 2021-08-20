@@ -140,33 +140,6 @@ mod tests {
         };
     }
 
-    macro_rules! test_conversion {
-        (
-            method: $method: ident,
-            expected_value: $result: expr,
-        ) => {
-            test_conversion! {
-                name: $method,
-                method: $method,
-                input: INPUT,
-                expected_value: $result,
-            }
-        };
-        (
-            name: $name: ident,
-            method: $method: ident,
-            input: $input: expr,
-            expected_value: $result: expr,
-        ) => {
-            #[test]
-            fn $name() {
-                let value: &[u8] = $input.as_ref();
-                let result = SensorValuesV3::try_from(value).unwrap();
-                assert_eq!(result.$method(), $result);
-            }
-        };
-    }
-
     test_parser! {
         name: invalid_input_length,
         input: [103, 22, 50, 60, 70],
@@ -199,62 +172,25 @@ mod tests {
         }),
     }
 
-    test_conversion! {
-        method: temperature_as_millicelsius,
-        expected_value: Some(1690),
+    crate::test_conversion_methods! {
+        type_: SensorValuesV3,
+        input: INPUT,
+        acceleration_vector_as_milli_g: Some(AccelerationVector(1000, 1255, 1510)),
+        battery_potential_as_millivolts: Some(2182),
+        humidity_as_ppm: Some(115_000),
+        mac_address: None,
+        measurement_sequence_number: None,
+        movement_counter: None,
+        pressure_as_pascals: Some(63_656),
+        temperature_as_millicelsius: Some(1690),
+        tx_power_as_dbm: None,
     }
 
-    test_conversion! {
-        name: negative_temperature_as_millicelsius,
-        method: temperature_as_millicelsius,
+    crate::test_conversion_methods! {
+        name: negative_inputs,
+        type_: SensorValuesV3,
         input: NEGATIVE_INPUT,
-        expected_value: Some(-1690),
-    }
-
-    test_conversion! {
-        method: pressure_as_pascals,
-        expected_value: Some(63656),
-    }
-
-    test_conversion! {
-        method: humidity_as_ppm,
-        expected_value: Some(115_000),
-    }
-
-    test_conversion! {
-        method: acceleration_vector_as_milli_g,
-        expected_value: Some(AccelerationVector(1000, 1255, 1510)),
-    }
-
-    test_conversion! {
-        name: negative_acceleration_vector_as_milli_g,
-        method: acceleration_vector_as_milli_g,
-        input: NEGATIVE_INPUT,
-        expected_value: Some(AccelerationVector(-1000, -1255, -1510)),
-    }
-
-    test_conversion! {
-        method: battery_potential_as_millivolts,
-        expected_value: Some(2182),
-    }
-
-    test_conversion! {
-        method: tx_power_as_dbm,
-        expected_value: None,
-    }
-
-    test_conversion! {
-        method: movement_counter,
-        expected_value: None,
-    }
-
-    test_conversion! {
-        method: measurement_sequence_number,
-        expected_value: None,
-    }
-
-    test_conversion! {
-        method: mac_address,
-        expected_value: None,
+        acceleration_vector_as_milli_g: Some(AccelerationVector(-1000, -1255, -1510)),
+        temperature_as_millicelsius: Some(-1690),
     }
 }
