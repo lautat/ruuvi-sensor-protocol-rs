@@ -1,9 +1,8 @@
 use core::convert::TryFrom;
 
 use crate::{
-    Acceleration, AccelerationVector, BatteryPotential, Humidity, MacAddress,
-    MeasurementSequenceNumber, MovementCounter, ParseError, Pressure, Temperature,
-    TransmitterPower,
+    errors::ParseError, Acceleration, AccelerationVector, BatteryPotential, Humidity, MacAddress,
+    MeasurementSequenceNumber, MovementCounter, Pressure, Temperature, TransmitterPower,
 };
 
 const PROTOCOL_VERSION: u8 = 5;
@@ -137,10 +136,10 @@ impl TryFrom<&[u8]> for SensorValuesV5 {
                     ],
                     power_info: u16::from_be_bytes([*power_1, *power_2]),
                     movement_counter: *movement_counter,
-                    measurement_sequence_number: u16::from_be_bytes(
-                        [*measurement_sequence_number_1,
-                        *measurement_sequence_number_2,]
-                    ),
+                    measurement_sequence_number: u16::from_be_bytes([
+                        *measurement_sequence_number_1,
+                        *measurement_sequence_number_2,
+                    ]),
                     mac_address: [*mac_1, *mac_2, *mac_3, *mac_4, *mac_5, *mac_6],
                 })
             }

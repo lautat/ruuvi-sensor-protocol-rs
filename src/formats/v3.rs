@@ -1,9 +1,8 @@
 use core::convert::TryFrom;
 
 use crate::{
-    Acceleration, AccelerationVector, BatteryPotential, Humidity, MacAddress,
-    MeasurementSequenceNumber, MovementCounter, ParseError, Pressure, Temperature,
-    TransmitterPower,
+    errors::ParseError, Acceleration, AccelerationVector, BatteryPotential, Humidity, MacAddress,
+    MeasurementSequenceNumber, MovementCounter, Pressure, Temperature, TransmitterPower,
 };
 
 const PROTOCOL_VERSION: u8 = 3;
