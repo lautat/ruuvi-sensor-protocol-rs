@@ -1,8 +1,14 @@
 use core::convert::TryFrom;
 
 use crate::{
-    errors::ParseError, Acceleration, AccelerationVector, BatteryPotential, Humidity, MacAddress,
-    MeasurementSequenceNumber, MovementCounter, Pressure, Temperature, TransmitterPower,
+    errors::ParseError,
+    formats::{
+        traits::{
+            Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
+            MovementCounter, Pressure, Temperature, TransmitterPower,
+        },
+        AccelerationVector,
+    },
 };
 
 const PROTOCOL_VERSION: u8 = 5;

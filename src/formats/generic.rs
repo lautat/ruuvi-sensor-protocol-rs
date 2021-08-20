@@ -1,9 +1,16 @@
 use core::convert::TryFrom;
 
 use crate::{
-    errors::ParseError, formats::v3::SensorValuesV3, formats::v5::SensorValuesV5, Acceleration,
-    AccelerationVector, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
-    MovementCounter, Pressure, Temperature, TransmitterPower,
+    errors::ParseError,
+    formats::{
+        traits::{
+            Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
+            MovementCounter, Pressure, Temperature, TransmitterPower,
+        },
+        v3::SensorValuesV3,
+        v5::SensorValuesV5,
+        AccelerationVector,
+    },
 };
 
 /// Represents a set of values read from sensors on the device
