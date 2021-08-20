@@ -118,134 +118,143 @@ impl TryFrom<&[u8]> for SensorValuesV3 {
 mod tests {
     use super::*;
 
-    #[test]
-    fn parse_version_3_data_with_invalid_length() {
-        let value: [u8; 5] = [103, 22, 50, 60, 70];
-        let result = SensorValuesV3::try_from(&value[..]);
-        assert_eq!(
-            result,
-            Err(ParseError::InvalidValueLength(
-                PROTOCOL_VERSION,
-                6,
-                EXPECTED_VALUE_LENGTH
-            ))
-        );
+    const INPUT: &[u8] = &[
+        0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
+    ];
+    const NEGATIVE_INPUT: &[u8] = &[
+        0x17, 0x81, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
+    ];
+
+    macro_rules! test_parser {
+        (
+            name: $name: ident,
+            input: $input: expr,
+            result: $result: expr,
+        ) => {
+            #[test]
+            fn $name() {
+                let value: &[u8] = $input.as_ref();
+                let result = SensorValuesV3::try_from(value);
+                assert_eq!(result, $result);
+            }
+        };
     }
 
-    #[test]
-    fn parse_valid_version_3_data() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]);
-        assert_eq!(
-            result,
-            Ok(SensorValuesV3 {
-                humidity: 0x17,
-                temperature: 0x0145,
-                pressure: 0x3558,
-                acceleration: AccelerationVector(1000, 1255, 1510),
-                battery_potential: 0x0886
-            })
-        );
+    macro_rules! test_conversion {
+        (
+            method: $method: ident,
+            expected_value: $result: expr,
+        ) => {
+            test_conversion! {
+                name: $method,
+                method: $method,
+                input: INPUT,
+                expected_value: $result,
+            }
+        };
+        (
+            name: $name: ident,
+            method: $method: ident,
+            input: $input: expr,
+            expected_value: $result: expr,
+        ) => {
+            #[test]
+            fn $name() {
+                let value: &[u8] = $input.as_ref();
+                let result = SensorValuesV3::try_from(value).unwrap();
+                assert_eq!(result.$method(), $result);
+            }
+        };
     }
 
-    #[test]
-    fn temperature_millicelsius_conversion() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.temperature_as_millicelsius(), Some(1690));
+    test_parser! {
+        name: invalid_input_length,
+        input: [103, 22, 50, 60, 70],
+        result: Err(ParseError::InvalidValueLength(
+            PROTOCOL_VERSION,
+            6,
+            EXPECTED_VALUE_LENGTH
+        )),
     }
 
-    #[test]
-    fn negative_temperature_millicelsius_conversion() {
-        let value: [u8; 13] = [
-            0x17, 0x81, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.temperature_as_millicelsius(), Some(-1690));
+    test_parser! {
+        name: empty_input,
+        input: [],
+        result: Err(ParseError::InvalidValueLength(
+            PROTOCOL_VERSION,
+            1,
+            EXPECTED_VALUE_LENGTH
+        )),
     }
 
-    #[test]
-    fn pressure_pascals_conversion() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.pressure_as_pascals(), Some(63656));
+    test_parser! {
+        name: valid_input,
+        input: INPUT,
+        result: Ok(SensorValuesV3 {
+            humidity: 0x17,
+            temperature: 0x0145,
+            pressure: 0x3558,
+            acceleration: AccelerationVector(1000, 1255, 1510),
+            battery_potential: 0x0886
+        }),
     }
 
-    #[test]
-    fn humidity_ppm_conversion() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.humidity_as_ppm(), Some(115_000));
+    test_conversion! {
+        method: temperature_as_millicelsius,
+        expected_value: Some(1690),
     }
 
-    #[test]
-    fn acceleration_decode() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.acceleration, AccelerationVector(1000, 1255, 1510));
+    test_conversion! {
+        name: negative_temperature_as_millicelsius,
+        method: temperature_as_millicelsius,
+        input: NEGATIVE_INPUT,
+        expected_value: Some(-1690),
     }
 
-    #[test]
-    fn negative_acceleration_decode() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.acceleration, AccelerationVector(-1000, -1255, -1510));
+    test_conversion! {
+        method: pressure_as_pascals,
+        expected_value: Some(63656),
     }
 
-    #[test]
-    fn battery_potential_decode() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.battery_potential, 2182);
+    test_conversion! {
+        method: humidity_as_ppm,
+        expected_value: Some(115_000),
     }
 
-    #[test]
-    fn tx_power_not_set() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.tx_power_as_dbm(), None);
+    test_conversion! {
+        method: acceleration_vector_as_milli_g,
+        expected_value: Some(AccelerationVector(1000, 1255, 1510)),
     }
 
-    #[test]
-    fn movement_counter_not_set() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.movement_counter(), None);
+    test_conversion! {
+        name: negative_acceleration_vector_as_milli_g,
+        method: acceleration_vector_as_milli_g,
+        input: NEGATIVE_INPUT,
+        expected_value: Some(AccelerationVector(-1000, -1255, -1510)),
     }
 
-    #[test]
-    fn measurement_sequence_number_not_set() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.measurement_sequence_number(), None);
+    test_conversion! {
+        method: battery_potential_as_millivolts,
+        expected_value: Some(2182),
     }
 
-    #[test]
-    fn mac_address_not_set() {
-        let value: [u8; 13] = [
-            0x17, 0x01, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
-        ];
-        let result = SensorValuesV3::try_from(&value[..]).unwrap();
-        assert_eq!(result.mac_address(), None);
+    test_conversion! {
+        method: tx_power_as_dbm,
+        expected_value: None,
+    }
+
+    test_conversion! {
+        method: movement_counter,
+        expected_value: None,
+    }
+
+    test_conversion! {
+        method: measurement_sequence_number,
+        expected_value: None,
+    }
+
+    test_conversion! {
+        method: mac_address,
+        expected_value: None,
     }
 }
