@@ -69,7 +69,11 @@ mod tests {
     }
 
     macro_rules! test_kelvins_to_celcius_conversion {
-        ($name: ident, $milli_kelvins: expr, $milli_celsius: expr) => {
+        (
+            test_name: $name: ident,
+            milli_kelvins: $milli_kelvins: expr,
+            milli_celsius: $milli_celsius: expr,
+        ) => {
             #[test]
             fn $name() {
                 let value = Value {
@@ -80,11 +84,45 @@ mod tests {
         };
     }
 
-    test_kelvins_to_celcius_conversion!(zero_kelvins, Some(0), Some(-273_150));
-    test_kelvins_to_celcius_conversion!(zero_celsius, Some(273_150), Some(0));
-    test_kelvins_to_celcius_conversion!(sub_zero_celsius_1, Some(263_080), Some(-10_070));
-    test_kelvins_to_celcius_conversion!(sub_zero_celsius_2, Some(194_924), Some(-78_226));
-    test_kelvins_to_celcius_conversion!(above_zero_celsius_1, Some(4343_934), Some(4070_784));
-    test_kelvins_to_celcius_conversion!(above_zero_celsius_2, Some(291_655), Some(18_505));
-    test_kelvins_to_celcius_conversion!(no_temperature, None, None);
+    test_kelvins_to_celcius_conversion! {
+        test_name: zero_kelvins,
+        milli_kelvins: Some(0),
+        milli_celsius: Some(-273_150),
+    }
+
+    test_kelvins_to_celcius_conversion! {
+        test_name: zero_celsius,
+        milli_kelvins: Some(273_150),
+        milli_celsius: Some(0),
+    }
+
+    test_kelvins_to_celcius_conversion! {
+        test_name: sub_zero_celsius_1,
+        milli_kelvins: Some(263_080),
+        milli_celsius: Some(-10_070),
+    }
+
+    test_kelvins_to_celcius_conversion! {
+        test_name: sub_zero_celsius_2,
+        milli_kelvins: Some(194_924),
+        milli_celsius: Some(-78_226),
+    }
+
+    test_kelvins_to_celcius_conversion! {
+        test_name: above_zero_celsius_1,
+        milli_kelvins: Some(4343_934),
+        milli_celsius: Some(4070_784),
+    }
+
+    test_kelvins_to_celcius_conversion! {
+        test_name: above_zero_celsius_2,
+        milli_kelvins: Some(291_655),
+        milli_celsius: Some(18_505),
+    }
+
+    test_kelvins_to_celcius_conversion! {
+        test_name: no_temperature,
+        milli_kelvins: None,
+        milli_celsius: None,
+    }
 }
