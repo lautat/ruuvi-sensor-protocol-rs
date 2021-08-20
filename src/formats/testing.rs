@@ -1,21 +1,6 @@
 #[macro_export]
 macro_rules! test_conversion_methods {
     (
-        type_: $type: ty,
-        input: $input: expr,
-        $($method: ident: $result: expr),+,
-    ) => {
-        $(
-            $crate::test_conversion_method! {
-                name: $method,
-                type_: $type,
-                input: $input,
-                method: $method,
-                expected_value: $result,
-            }
-        )+
-    };
-    (
         name: $name: ident,
         type_: $type: ty,
         input: $input: expr,
@@ -24,16 +9,38 @@ macro_rules! test_conversion_methods {
         mod $name {
             use super::*;
 
-            $(
-                $crate::test_conversion_method! {
-                    name: $method,
-                    type_: $type,
-                    input: $input,
-                    method: $method,
-                    expected_value: $result,
-                }
-            )+
+            $crate::test_conversion_methods! {
+                type_: $type,
+                input: $input,
+                $($method: $result),+,
+            }
         }
+    };
+    (
+        type_: $type: ty,
+        input: $input: expr,
+        $($method: ident: $result: expr),+,
+    ) => {
+        $crate::test_conversion_methods! {
+            values: {
+                let value: &[u8] = $input.as_ref();
+                <$type>::try_from(value).unwrap()
+            },
+            $($method: $result),+,
+        }
+    };
+    (
+        values: $values: expr,
+        $($method: ident: $result: expr),+,
+    ) => {
+        $(
+            $crate::test_conversion_method! {
+                name: $method,
+                values: $values,
+                method: $method,
+                expected_value: $result,
+            }
+        )+
     };
 }
 
@@ -41,15 +48,13 @@ macro_rules! test_conversion_methods {
 macro_rules! test_conversion_method {
     (
         name: $name: ident,
-        type_: $type: ty,
-        input: $input: expr,
+        values: $values: expr,
         method: $method: ident,
         expected_value: $result: expr,
     ) => {
         #[test]
         fn $name() {
-            let value: &[u8] = $input.as_ref();
-            let result = <$type>::try_from(value).unwrap();
+            let result = $values;
             assert_eq!(result.$method(), $result);
         }
     };
