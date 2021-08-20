@@ -156,10 +156,10 @@ impl Display for ParseError {
 #[cfg(feature = "std")]
 impl Error for ParseError {}
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
-    #[allow(dead_code)]
     struct Value {
         temperature: Option<u32>,
     }
