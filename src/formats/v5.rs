@@ -213,254 +213,142 @@ mod tests {
         );
     }
 
-    mod temperature {
-        use super::*;
+    macro_rules! test_conversions {
+        (
+            method_name: $method: ident,
+            valid_value: $value: expr,
+            min_value: $min: expr,
+            max_value: $max: expr,
+        ) => {
+            mod $method {
+                use super::*;
 
-        #[test]
-        fn millicelsius_conversion() {
-            let result = SensorValuesV5::try_from(&VALID_DATA[..]).unwrap();
-            assert_eq!(result.temperature_as_millicelsius(), Some(24_300));
-        }
+                test_conversion! {
+                    name: conversion,
+                    method: $method,
+                    input: VALID_DATA,
+                    expected_value: $value,
+                }
 
-        #[test]
-        fn max_conversion() {
-            let result = SensorValuesV5::try_from(&MAX_VALUES[..]).unwrap();
-            assert_eq!(result.temperature_as_millicelsius(), Some(163_835));
-        }
+                test_conversion! {
+                    name: min_conversion,
+                    method: $method,
+                    input: MIN_VALUES,
+                    expected_value: $min,
+                }
 
-        #[test]
-        fn min_conversion() {
-            let result = SensorValuesV5::try_from(&MIN_VALUES[..]).unwrap();
-            assert_eq!(result.temperature_as_millicelsius(), Some(-163_835));
-        }
+                test_conversion! {
+                    name: max_conversion,
+                    method: $method,
+                    input: MAX_VALUES,
+                    expected_value: $max,
+                }
 
-        #[test]
-        fn invalid_conversion() {
-            let result = SensorValuesV5::try_from(&INVALID_VALUES[..]).unwrap();
-            assert_eq!(result.temperature_as_millicelsius(), None);
-        }
+                test_conversion! {
+                    name: invalid_conversion,
+                    method: $method,
+                    input: INVALID_VALUES,
+                    expected_value: None,
+                }
+            }
+        };
+        (
+            method_name: $method: ident,
+            valid_value: $value: expr,
+        ) => {
+            mod $method {
+                use super::*;
+
+                test_conversion! {
+                    name: conversion,
+                    method: $method,
+                    input: VALID_DATA,
+                    expected_value: $value,
+                }
+
+                test_conversion! {
+                    name: invalid_conversion,
+                    method: $method,
+                    input: INVALID_VALUES,
+                    expected_value: None,
+                }
+            }
+        };
     }
 
-    mod humidity {
-        use super::*;
-
-        #[test]
-        fn ppm_conversion() {
-            let result = SensorValuesV5::try_from(&VALID_DATA[..]).unwrap();
-            assert_eq!(result.humidity_as_ppm(), Some(534_900));
-        }
-
-        #[test]
-        fn max_conversion() {
-            let result = SensorValuesV5::try_from(&MAX_VALUES[..]).unwrap();
-            assert_eq!(result.humidity_as_ppm(), Some(1_638_350))
-        }
-
-        #[test]
-        fn min_conversion() {
-            let result = SensorValuesV5::try_from(&MIN_VALUES[..]).unwrap();
-            assert_eq!(result.humidity_as_ppm(), Some(0))
-        }
-
-        #[test]
-        fn invalid_conversion() {
-            let result = SensorValuesV5::try_from(&INVALID_VALUES[..]).unwrap();
-            assert_eq!(result.humidity_as_ppm(), None)
-        }
+    macro_rules! test_conversion {
+        (
+            name: $name: ident,
+            method: $method: ident,
+            input: $input: ident,
+            expected_value: $expected: expr,
+        ) => {
+            #[test]
+            fn $name() {
+                let result = SensorValuesV5::try_from(&$input[..]).unwrap();
+                assert_eq!(result.$method(), $expected);
+            }
+        };
     }
 
-    mod pressure {
-        use super::*;
-
-        #[test]
-        fn pascals_conversion() {
-            let result = SensorValuesV5::try_from(&VALID_DATA[..]).unwrap();
-            assert_eq!(result.pressure_as_pascals(), Some(100_044));
-        }
-
-        #[test]
-        fn max_conversion() {
-            let result = SensorValuesV5::try_from(&MAX_VALUES[..]).unwrap();
-            assert_eq!(result.pressure_as_pascals(), Some(115_534))
-        }
-
-        #[test]
-        fn min_conversion() {
-            let result = SensorValuesV5::try_from(&MIN_VALUES[..]).unwrap();
-            assert_eq!(result.pressure_as_pascals(), Some(50_000))
-        }
-
-        #[test]
-        fn invalid_conversion() {
-            let result = SensorValuesV5::try_from(&INVALID_VALUES[..]).unwrap();
-            assert_eq!(result.pressure_as_pascals(), None)
-        }
+    test_conversions! {
+        method_name: acceleration_vector_as_milli_g,
+        valid_value: Some(AccelerationVector(4, -4, 1_036)),
+        min_value: Some(AccelerationVector(-32_767, -32_767, -32_767)),
+        max_value: Some(AccelerationVector(32_767, 32_767, 32_767)),
     }
 
-    mod acceleration {
-        use super::*;
-        #[test]
-        fn conversion() {
-            let result = SensorValuesV5::try_from(&VALID_DATA[..]).unwrap();
-            assert_eq!(
-                result.acceleration_vector_as_milli_g(),
-                Some(AccelerationVector(4, -4, 1_036))
-            );
-        }
-
-        #[test]
-        fn max_conversion() {
-            let result = SensorValuesV5::try_from(&MAX_VALUES[..]).unwrap();
-            assert_eq!(
-                result.acceleration_vector_as_milli_g(),
-                Some(AccelerationVector(32_767, 32_767, 32_767))
-            )
-        }
-
-        #[test]
-        fn min_conversion() {
-            let result = SensorValuesV5::try_from(&MIN_VALUES[..]).unwrap();
-            assert_eq!(
-                result.acceleration_vector_as_milli_g(),
-                Some(AccelerationVector(-32_767, -32_767, -32_767))
-            )
-        }
-
-        #[test]
-        fn invalid_conversion() {
-            let result = SensorValuesV5::try_from(&INVALID_VALUES[..]).unwrap();
-            assert_eq!(result.acceleration_vector_as_milli_g(), None)
-        }
+    test_conversions! {
+        method_name: battery_potential_as_millivolts,
+        valid_value: Some(2_977),
+        min_value: Some(1_600),
+        max_value: Some(3_646),
     }
 
-    mod batter_potential {
-        use super::*;
-
-        #[test]
-        fn millivolts_conversion() {
-            let result = SensorValuesV5::try_from(&VALID_DATA[..]).unwrap();
-            assert_eq!(result.battery_potential_as_millivolts(), Some(2_977));
-        }
-
-        #[test]
-        fn max_conversion() {
-            let result = SensorValuesV5::try_from(&MAX_VALUES[..]).unwrap();
-            assert_eq!(result.battery_potential_as_millivolts(), Some(3_646))
-        }
-
-        #[test]
-        fn min_conversion() {
-            let result = SensorValuesV5::try_from(&MIN_VALUES[..]).unwrap();
-            assert_eq!(result.battery_potential_as_millivolts(), Some(1_600))
-        }
-
-        #[test]
-        fn invalid_conversion() {
-            let result = SensorValuesV5::try_from(&INVALID_VALUES[..]).unwrap();
-            assert_eq!(result.battery_potential_as_millivolts(), None)
-        }
+    test_conversions! {
+        method_name: humidity_as_ppm,
+        valid_value: Some(534_900),
+        min_value: Some(0),
+        max_value: Some(1_638_350),
     }
 
-    mod tx_power {
-        use super::*;
-
-        #[test]
-        fn dbm_conversion() {
-            let result = SensorValuesV5::try_from(&VALID_DATA[..]).unwrap();
-            assert_eq!(result.tx_power_as_dbm(), Some(4));
-        }
-
-        #[test]
-        fn max_conversion() {
-            let result = SensorValuesV5::try_from(&MAX_VALUES[..]).unwrap();
-            assert_eq!(result.tx_power_as_dbm(), Some(20))
-        }
-
-        #[test]
-        fn min_conversion() {
-            let result = SensorValuesV5::try_from(&MIN_VALUES[..]).unwrap();
-            assert_eq!(result.tx_power_as_dbm(), Some(-40))
-        }
-
-        #[test]
-        fn invalid_conversion() {
-            let result = SensorValuesV5::try_from(&INVALID_VALUES[..]).unwrap();
-            assert_eq!(result.tx_power_as_dbm(), None)
-        }
+    test_conversions! {
+        method_name: mac_address,
+        valid_value: Some([0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F]),
     }
 
-    mod movement_counter {
-        use super::*;
-
-        #[test]
-        fn valid_conversion() {
-            let result = SensorValuesV5::try_from(&VALID_DATA[..]).unwrap();
-            assert_eq!(result.movement_counter(), Some(66));
-        }
-
-        #[test]
-        fn max_conversion() {
-            let result = SensorValuesV5::try_from(&MAX_VALUES[..]).unwrap();
-            assert_eq!(result.movement_counter(), Some(254))
-        }
-
-        #[test]
-        fn min_conversion() {
-            let result = SensorValuesV5::try_from(&MIN_VALUES[..]).unwrap();
-            assert_eq!(result.movement_counter(), Some(0))
-        }
-
-        #[test]
-        fn invalid_conversion() {
-            let result = SensorValuesV5::try_from(&INVALID_VALUES[..]).unwrap();
-            assert_eq!(result.movement_counter(), None)
-        }
+    test_conversions! {
+        method_name: measurement_sequence_number,
+        valid_value: Some(205),
+        min_value: Some(0),
+        max_value: Some(65_534),
     }
 
-    mod measurement_sequence_number {
-        use super::*;
-
-        #[test]
-        fn valid_conversion() {
-            let result = SensorValuesV5::try_from(&VALID_DATA[..]).unwrap();
-            assert_eq!(result.measurement_sequence_number(), Some(205));
-        }
-
-        #[test]
-        fn max_conversion() {
-            let result = SensorValuesV5::try_from(&MAX_VALUES[..]).unwrap();
-            assert_eq!(result.measurement_sequence_number(), Some(65534))
-        }
-
-        #[test]
-        fn min_conversion() {
-            let result = SensorValuesV5::try_from(&MIN_VALUES[..]).unwrap();
-            assert_eq!(result.measurement_sequence_number(), Some(0))
-        }
-
-        #[test]
-        fn invalid_conversion() {
-            let result = SensorValuesV5::try_from(&INVALID_VALUES[..]).unwrap();
-            assert_eq!(result.measurement_sequence_number(), None)
-        }
+    test_conversions! {
+        method_name: movement_counter,
+        valid_value: Some(66),
+        min_value: Some(0),
+        max_value: Some(254),
     }
 
-    mod mac_address {
-        use super::*;
+    test_conversions! {
+        method_name: pressure_as_pascals,
+        valid_value: Some(100_044),
+        min_value: Some(50_000),
+        max_value: Some(115_534),
+    }
 
-        #[test]
-        fn valid_conversion() {
-            let result = SensorValuesV5::try_from(&VALID_DATA[..]).unwrap();
-            assert_eq!(
-                result.mac_address(),
-                Some([0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F])
-            );
-        }
+    test_conversions! {
+        method_name: temperature_as_millicelsius,
+        valid_value: Some(24_300),
+        min_value: Some(-163_835),
+        max_value: Some(163_835),
+    }
 
-        #[test]
-        fn invalid_conversion() {
-            let result = SensorValuesV5::try_from(&INVALID_VALUES[..]).unwrap();
-            assert_eq!(result.mac_address(), None)
-        }
+    test_conversions! {
+        method_name: tx_power_as_dbm,
+        valid_value: Some(4),
+        min_value: Some(-40),
+        max_value: Some(20),
     }
 }

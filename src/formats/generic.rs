@@ -56,7 +56,10 @@ impl SensorValues {
     /// assert_eq!(values.temperature_as_millicelsius(), Some(1690));
     /// # Ok::<(), ParseError>(())
     /// ```
-    pub fn from_manufacturer_specific_data(id: u16, value: impl AsRef<[u8]>) -> Result<Self, ParseError> {
+    pub fn from_manufacturer_specific_data(
+        id: u16,
+        value: impl AsRef<[u8]>,
+    ) -> Result<Self, ParseError> {
         match (id, value.as_ref()) {
             (0x0499, [3, data @ ..]) => {
                 let values = SensorValuesV3::try_from(data)?;
