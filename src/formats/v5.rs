@@ -1,4 +1,4 @@
-use core::convert::TryFrom;
+use core::convert::{TryFrom, TryInto};
 
 use crate::{
     errors::ParseError,
@@ -129,31 +129,40 @@ impl TryFrom<&[u8]> for SensorValues {
     type Error = ParseError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        match value {
-            [temperature_1, temperature_2, humidity_1, humidity_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, power_1, power_2, movement_counter, measurement_sequence_number_1, measurement_sequence_number_2, mac_1, mac_2, mac_3, mac_4, mac_5, mac_6] => {
-                Ok(Self {
-                    temperature: i16::from_be_bytes([*temperature_1, *temperature_2]),
-                    humidity: u16::from_be_bytes([*humidity_1, *humidity_2]),
-                    pressure: u16::from_be_bytes([*pressure_1, *pressure_2]),
-                    acceleration: [
-                        i16::from_be_bytes([*acceleration_x_1, *acceleration_x_2]),
-                        i16::from_be_bytes([*acceleration_y_1, *acceleration_y_2]),
-                        i16::from_be_bytes([*acceleration_z_1, *acceleration_z_2]),
-                    ],
-                    power_info: u16::from_be_bytes([*power_1, *power_2]),
-                    movement_counter: *movement_counter,
-                    measurement_sequence_number: u16::from_be_bytes([
-                        *measurement_sequence_number_1,
-                        *measurement_sequence_number_2,
-                    ]),
-                    mac_address: [*mac_1, *mac_2, *mac_3, *mac_4, *mac_5, *mac_6],
-                })
-            }
-            _ => Err(ParseError::InvalidValueLength(
+        let result: Result<&[u8; EXPECTED_VALUE_LENGTH - 1], _> = value.try_into();
+
+        if let Ok(value) = result {
+            Ok(Self::from(value))
+        } else {
+            Err(ParseError::InvalidValueLength(
                 PROTOCOL_VERSION,
                 value.len() + 1,
                 EXPECTED_VALUE_LENGTH,
-            )),
+            ))
+        }
+    }
+}
+
+impl From<&[u8; EXPECTED_VALUE_LENGTH - 1]> for SensorValues {
+    fn from(value: &[u8; EXPECTED_VALUE_LENGTH - 1]) -> Self {
+        let [temperature_1, temperature_2, humidity_1, humidity_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, power_1, power_2, movement_counter, measurement_sequence_number_1, measurement_sequence_number_2, mac_1, mac_2, mac_3, mac_4, mac_5, mac_6] =
+            value;
+        Self {
+            temperature: i16::from_be_bytes([*temperature_1, *temperature_2]),
+            humidity: u16::from_be_bytes([*humidity_1, *humidity_2]),
+            pressure: u16::from_be_bytes([*pressure_1, *pressure_2]),
+            acceleration: [
+                i16::from_be_bytes([*acceleration_x_1, *acceleration_x_2]),
+                i16::from_be_bytes([*acceleration_y_1, *acceleration_y_2]),
+                i16::from_be_bytes([*acceleration_z_1, *acceleration_z_2]),
+            ],
+            power_info: u16::from_be_bytes([*power_1, *power_2]),
+            movement_counter: *movement_counter,
+            measurement_sequence_number: u16::from_be_bytes([
+                *measurement_sequence_number_1,
+                *measurement_sequence_number_2,
+            ]),
+            mac_address: [*mac_1, *mac_2, *mac_3, *mac_4, *mac_5, *mac_6],
         }
     }
 }
