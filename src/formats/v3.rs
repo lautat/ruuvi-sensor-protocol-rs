@@ -11,8 +11,8 @@ use crate::{
     },
 };
 
-const PROTOCOL_VERSION: u8 = 3;
-const EXPECTED_VALUE_LENGTH: usize = 14;
+pub const VERSION: u8 = 3;
+pub const SIZE: usize = 13;
 
 #[derive(Debug, PartialEq)]
 pub struct SensorValues {
@@ -91,22 +91,22 @@ impl TryFrom<&[u8]> for SensorValues {
     type Error = ParseError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let result: Result<&[u8; EXPECTED_VALUE_LENGTH - 1], _> = value.try_into();
+        let result: Result<&[u8; SIZE], _> = value.try_into();
 
         if let Ok(value) = result {
             Ok(Self::from(value))
         } else {
             Err(ParseError::InvalidValueLength(
-                PROTOCOL_VERSION,
+                VERSION,
                 value.len() + 1,
-                EXPECTED_VALUE_LENGTH,
+                SIZE + 1,
             ))
         }
     }
 }
 
-impl From<&[u8; EXPECTED_VALUE_LENGTH - 1]> for SensorValues {
-    fn from(value: &[u8; EXPECTED_VALUE_LENGTH - 1]) -> Self {
+impl From<&[u8; SIZE]> for SensorValues {
+    fn from(value: &[u8; SIZE]) -> Self {
         let [humidity, temperature_1, temperature_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, potential_1, potential_2] =
             value;
         Self {
@@ -138,9 +138,9 @@ mod tests {
         name: invalid_input_length,
         input: [103, 22, 50, 60, 70],
         result: Err(ParseError::InvalidValueLength(
-            PROTOCOL_VERSION,
+            VERSION,
             6,
-            EXPECTED_VALUE_LENGTH
+            SIZE + 1
         )),
     }
 
@@ -148,9 +148,9 @@ mod tests {
         name: empty_input,
         input: [],
         result: Err(ParseError::InvalidValueLength(
-            PROTOCOL_VERSION,
+            VERSION,
             1,
-            EXPECTED_VALUE_LENGTH
+            SIZE + 1
         )),
     }
 
