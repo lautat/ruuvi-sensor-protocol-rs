@@ -34,28 +34,28 @@ macro_rules! test_measurement_trait_methods {
         $($method: ident: $result: expr),+,
     ) => {
         $(
-            $crate::test_measurement_trait_method! {
-                name: $method,
-                values: $values,
-                method: $method,
-                expected_value: $result,
+            #[test]
+            fn $method() {
+                let result = $values;
+                assert_eq!(result.$method(), $result);
             }
         )+
     };
 }
 
 #[macro_export]
-macro_rules! test_measurement_trait_method {
+macro_rules! test_parser {
     (
         name: $name: ident,
-        values: $values: expr,
-        method: $method: ident,
-        expected_value: $result: expr,
+        type_: $type: ty,
+        input: $input: expr,
+        result: $result: expr,
     ) => {
         #[test]
         fn $name() {
-            let result = $values;
-            assert_eq!(result.$method(), $result);
+            let input: &[u8] = $input.as_ref();
+            let result = <$type>::try_from(input);
+            assert_eq!(result, $result);
         }
     };
 }

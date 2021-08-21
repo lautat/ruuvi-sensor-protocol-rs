@@ -181,36 +181,42 @@ mod tests {
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     ];
 
-    #[test]
-    fn parse_version_5_data_with_invalid_length() {
-        let value: [u8; 5] = [103, 22, 50, 60, 70];
-        let result = SensorValuesV5::try_from(&value[..]);
-        assert_eq!(
-            result,
-            Err(ParseError::InvalidValueLength(
-                PROTOCOL_VERSION,
-                6,
-                EXPECTED_VALUE_LENGTH
-            ))
-        );
+    crate::test_parser! {
+        name: invalid_input_length,
+        type_: SensorValuesV5,
+        input: [103, 22, 50, 60, 70],
+        result: Err(ParseError::InvalidValueLength(
+            PROTOCOL_VERSION,
+            6,
+            EXPECTED_VALUE_LENGTH
+        )),
     }
 
-    #[test]
-    fn parse_valid_version_5_data() {
-        let result = SensorValuesV5::try_from(&VALID_VALUES[..]);
-        assert_eq!(
-            result,
-            Ok(SensorValuesV5 {
-                humidity: 0x5394,
-                temperature: 0x12FC,
-                pressure: 0xC37C,
-                acceleration: [4, -4, 1036],
-                power_info: 0xAC36,
-                movement_counter: 0x42,
-                measurement_sequence_number: 0xCD,
-                mac_address: [0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F],
-            })
-        );
+    crate::test_parser! {
+        name: empty_input,
+        type_: SensorValuesV5,
+        input: [],
+        result: Err(ParseError::InvalidValueLength(
+            PROTOCOL_VERSION,
+            1,
+            EXPECTED_VALUE_LENGTH
+        )),
+    }
+
+    crate::test_parser! {
+        name: valid_input,
+        type_: SensorValuesV5,
+        input: VALID_VALUES,
+        result: Ok(SensorValuesV5 {
+            humidity: 0x5394,
+            temperature: 0x12FC,
+            pressure: 0xC37C,
+            acceleration: [4, -4, 1036],
+            power_info: 0xAC36,
+            movement_counter: 0x42,
+            measurement_sequence_number: 0xCD,
+            mac_address: [0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F],
+        }),
     }
 
     crate::test_measurement_trait_methods! {

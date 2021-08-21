@@ -125,23 +125,9 @@ mod tests {
         0x17, 0x81, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
     ];
 
-    macro_rules! test_parser {
-        (
-            name: $name: ident,
-            input: $input: expr,
-            result: $result: expr,
-        ) => {
-            #[test]
-            fn $name() {
-                let value: &[u8] = $input.as_ref();
-                let result = SensorValuesV3::try_from(value);
-                assert_eq!(result, $result);
-            }
-        };
-    }
-
-    test_parser! {
+    crate::test_parser! {
         name: invalid_input_length,
+        type_: SensorValuesV3,
         input: [103, 22, 50, 60, 70],
         result: Err(ParseError::InvalidValueLength(
             PROTOCOL_VERSION,
@@ -150,8 +136,9 @@ mod tests {
         )),
     }
 
-    test_parser! {
+    crate::test_parser! {
         name: empty_input,
+        type_: SensorValuesV3,
         input: [],
         result: Err(ParseError::InvalidValueLength(
             PROTOCOL_VERSION,
@@ -160,8 +147,9 @@ mod tests {
         )),
     }
 
-    test_parser! {
+    crate::test_parser! {
         name: valid_input,
+        type_: SensorValuesV3,
         input: INPUT,
         result: Ok(SensorValuesV3 {
             humidity: 0x17,

@@ -164,20 +164,7 @@ mod tests {
     macro_rules! test_parser {
         (
             name: $name: ident,
-            input: $input: expr,
-            result: $result: expr,
-        ) => {
-            test_parser! {
-                name: $name,
-                input_id: 0x0499,
-                input_value: $input,
-                result: $result,
-            }
-        };
-        (
-            name: $name: ident,
-            input_id: $id: expr,
-            input_value: $value: expr,
+            input: ($id: expr, $value: expr),
             result: $result: expr,
         ) => {
             #[test]
@@ -190,20 +177,19 @@ mod tests {
 
     test_parser! {
         name: unsupported_manufacturer_id,
-        input_id: 0x0477,
-        input_value: [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        input: (0x0477, [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
         result: Err(ParseError::UnknownManufacturerId(0x0477)),
     }
 
     test_parser! {
         name: unsupported_format,
-        input: [0, 1, 2, 3],
+        input: (0x0499, [0, 1, 2, 3]),
         result: Err(ParseError::UnsupportedFormatVersion(0)),
     }
 
     test_parser! {
         name: empty_data,
-        input: [],
+        input: (0x0499, []),
         result: Err(ParseError::EmptyValue),
     }
 
@@ -222,13 +208,13 @@ mod tests {
 
                 test_parser! {
                     name: input_with_invalid_length,
-                    input: &INPUT[..8],
+                    input: (0x0499, &INPUT[..8]),
                     result: Err(ParseError::InvalidValueLength($version, 8, INPUT.len())),
                 }
 
                 test_parser! {
                     name: valid_input,
-                    input: INPUT,
+                    input: (0x0499, INPUT),
                     result: Ok(RESULT),
                 }
 
