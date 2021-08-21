@@ -15,7 +15,7 @@ const PROTOCOL_VERSION: u8 = 3;
 const EXPECTED_VALUE_LENGTH: usize = 14;
 
 #[derive(Debug, PartialEq)]
-pub struct SensorValuesV3 {
+pub struct SensorValues {
     humidity: u8,
     temperature: u16,
     pressure: u16,
@@ -23,49 +23,49 @@ pub struct SensorValuesV3 {
     battery_potential: u16,
 }
 
-impl Acceleration for SensorValuesV3 {
+impl Acceleration for SensorValues {
     fn acceleration_vector_as_milli_g(&self) -> Option<AccelerationVector> {
         Some(self.acceleration)
     }
 }
 
-impl BatteryPotential for SensorValuesV3 {
+impl BatteryPotential for SensorValues {
     fn battery_potential_as_millivolts(&self) -> Option<u16> {
         Some(self.battery_potential)
     }
 }
 
-impl Humidity for SensorValuesV3 {
+impl Humidity for SensorValues {
     fn humidity_as_ppm(&self) -> Option<u32> {
         Some(u32::from(self.humidity) * 5_000)
     }
 }
 
-impl MacAddress for SensorValuesV3 {
+impl MacAddress for SensorValues {
     fn mac_address(&self) -> Option<[u8; 6]> {
         None
     }
 }
 
-impl MeasurementSequenceNumber for SensorValuesV3 {
+impl MeasurementSequenceNumber for SensorValues {
     fn measurement_sequence_number(&self) -> Option<u32> {
         None
     }
 }
 
-impl MovementCounter for SensorValuesV3 {
+impl MovementCounter for SensorValues {
     fn movement_counter(&self) -> Option<u32> {
         None
     }
 }
 
-impl Pressure for SensorValuesV3 {
+impl Pressure for SensorValues {
     fn pressure_as_pascals(&self) -> Option<u32> {
         Some(u32::from(self.pressure) + 50_000)
     }
 }
 
-impl Temperature for SensorValuesV3 {
+impl Temperature for SensorValues {
     fn temperature_as_millikelvins(&self) -> Option<u32> {
         let integer_part = u32::from((self.temperature >> 8) & 0x7F);
         let decimal_part = u32::from(self.temperature & 0xFF);
@@ -81,13 +81,13 @@ impl Temperature for SensorValuesV3 {
     }
 }
 
-impl TransmitterPower for SensorValuesV3 {
+impl TransmitterPower for SensorValues {
     fn tx_power_as_dbm(&self) -> Option<i8> {
         None
     }
 }
 
-impl TryFrom<&[u8]> for SensorValuesV3 {
+impl TryFrom<&[u8]> for SensorValues {
     type Error = ParseError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
@@ -127,7 +127,6 @@ mod tests {
 
     crate::test_parser! {
         name: invalid_input_length,
-        type_: SensorValuesV3,
         input: [103, 22, 50, 60, 70],
         result: Err(ParseError::InvalidValueLength(
             PROTOCOL_VERSION,
@@ -138,7 +137,6 @@ mod tests {
 
     crate::test_parser! {
         name: empty_input,
-        type_: SensorValuesV3,
         input: [],
         result: Err(ParseError::InvalidValueLength(
             PROTOCOL_VERSION,
@@ -149,9 +147,8 @@ mod tests {
 
     crate::test_parser! {
         name: valid_input,
-        type_: SensorValuesV3,
         input: INPUT,
-        result: Ok(SensorValuesV3 {
+        result: Ok(SensorValues {
             humidity: 0x17,
             temperature: 0x0145,
             pressure: 0x3558,
@@ -161,7 +158,7 @@ mod tests {
     }
 
     crate::test_measurement_trait_methods! {
-        type_: SensorValuesV3,
+        name: positive_inputs,
         input: INPUT,
         acceleration_vector_as_milli_g: Some(AccelerationVector(1000, 1255, 1510)),
         battery_potential_as_millivolts: Some(2182),
@@ -176,7 +173,6 @@ mod tests {
 
     crate::test_measurement_trait_methods! {
         name: negative_inputs,
-        type_: SensorValuesV3,
         input: NEGATIVE_INPUT,
         acceleration_vector_as_milli_g: Some(AccelerationVector(-1000, -1255, -1510)),
         temperature_as_millicelsius: Some(-1690),

@@ -16,7 +16,7 @@ const EXPECTED_VALUE_LENGTH: usize = 24;
 
 #[derive(Debug, PartialEq)]
 /// Raw sensor values parsed from manufacturer data.
-pub struct SensorValuesV5 {
+pub struct SensorValues {
     humidity: u16,
     temperature: i16,
     pressure: u16,
@@ -27,7 +27,7 @@ pub struct SensorValuesV5 {
     mac_address: [u8; 6],
 }
 
-impl Acceleration for SensorValuesV5 {
+impl Acceleration for SensorValues {
     fn acceleration_vector_as_milli_g(&self) -> Option<AccelerationVector> {
         if self.acceleration.iter().all(|acc| *acc != i16::min_value()) {
             Some(AccelerationVector(
@@ -41,7 +41,7 @@ impl Acceleration for SensorValuesV5 {
     }
 }
 
-impl BatteryPotential for SensorValuesV5 {
+impl BatteryPotential for SensorValues {
     fn battery_potential_as_millivolts(&self) -> Option<u16> {
         let raw_value = self.power_info >> 5;
         if raw_value != 2047 {
@@ -52,7 +52,7 @@ impl BatteryPotential for SensorValuesV5 {
     }
 }
 
-impl Humidity for SensorValuesV5 {
+impl Humidity for SensorValues {
     fn humidity_as_ppm(&self) -> Option<u32> {
         if self.humidity != 0xFFFF {
             Some(u32::from(self.humidity) * 25)
@@ -62,7 +62,7 @@ impl Humidity for SensorValuesV5 {
     }
 }
 
-impl MacAddress for SensorValuesV5 {
+impl MacAddress for SensorValues {
     fn mac_address(&self) -> Option<[u8; 6]> {
         if self.mac_address != [0xFF; 6] {
             Some(self.mac_address)
@@ -72,7 +72,7 @@ impl MacAddress for SensorValuesV5 {
     }
 }
 
-impl MeasurementSequenceNumber for SensorValuesV5 {
+impl MeasurementSequenceNumber for SensorValues {
     fn measurement_sequence_number(&self) -> Option<u32> {
         if self.measurement_sequence_number != 0xFFFF {
             Some(u32::from(self.measurement_sequence_number))
@@ -82,7 +82,7 @@ impl MeasurementSequenceNumber for SensorValuesV5 {
     }
 }
 
-impl MovementCounter for SensorValuesV5 {
+impl MovementCounter for SensorValues {
     fn movement_counter(&self) -> Option<u32> {
         if self.movement_counter != 0xFF {
             Some(u32::from(self.movement_counter))
@@ -92,7 +92,7 @@ impl MovementCounter for SensorValuesV5 {
     }
 }
 
-impl Pressure for SensorValuesV5 {
+impl Pressure for SensorValues {
     fn pressure_as_pascals(&self) -> Option<u32> {
         if self.pressure != 0xFFFF {
             Some(u32::from(self.pressure) + 50_000)
@@ -102,7 +102,7 @@ impl Pressure for SensorValuesV5 {
     }
 }
 
-impl Temperature for SensorValuesV5 {
+impl Temperature for SensorValues {
     fn temperature_as_millikelvins(&self) -> Option<u32> {
         if self.temperature != i16::min_value() {
             let temperature = i32::from(self.temperature) * 5;
@@ -114,7 +114,7 @@ impl Temperature for SensorValuesV5 {
     }
 }
 
-impl TransmitterPower for SensorValuesV5 {
+impl TransmitterPower for SensorValues {
     fn tx_power_as_dbm(&self) -> Option<i8> {
         let raw_value = (self.power_info & 0x1F) as i8;
         if raw_value != 31 {
@@ -125,7 +125,7 @@ impl TransmitterPower for SensorValuesV5 {
     }
 }
 
-impl TryFrom<&[u8]> for SensorValuesV5 {
+impl TryFrom<&[u8]> for SensorValues {
     type Error = ParseError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
@@ -183,7 +183,6 @@ mod tests {
 
     crate::test_parser! {
         name: invalid_input_length,
-        type_: SensorValuesV5,
         input: [103, 22, 50, 60, 70],
         result: Err(ParseError::InvalidValueLength(
             PROTOCOL_VERSION,
@@ -194,7 +193,6 @@ mod tests {
 
     crate::test_parser! {
         name: empty_input,
-        type_: SensorValuesV5,
         input: [],
         result: Err(ParseError::InvalidValueLength(
             PROTOCOL_VERSION,
@@ -205,9 +203,8 @@ mod tests {
 
     crate::test_parser! {
         name: valid_input,
-        type_: SensorValuesV5,
         input: VALID_VALUES,
-        result: Ok(SensorValuesV5 {
+        result: Ok(SensorValues {
             humidity: 0x5394,
             temperature: 0x12FC,
             pressure: 0xC37C,
@@ -221,7 +218,6 @@ mod tests {
 
     crate::test_measurement_trait_methods! {
         name: valid_values,
-        type_: SensorValuesV5,
         input: VALID_VALUES,
         acceleration_vector_as_milli_g: Some(AccelerationVector(4, -4, 1_036)),
         battery_potential_as_millivolts: Some(2_977),
@@ -236,7 +232,6 @@ mod tests {
 
     crate::test_measurement_trait_methods! {
         name: invalid_values,
-        type_: SensorValuesV5,
         input: INVALID_VALUES,
         acceleration_vector_as_milli_g: None,
         battery_potential_as_millivolts: None,
@@ -251,7 +246,6 @@ mod tests {
 
     crate::test_measurement_trait_methods! {
         name: min_values,
-        type_: SensorValuesV5,
         input: MIN_VALUES,
         acceleration_vector_as_milli_g: Some(AccelerationVector(-32_767, -32_767, -32_767)),
         battery_potential_as_millivolts: Some(1_600),
@@ -265,7 +259,6 @@ mod tests {
 
     crate::test_measurement_trait_methods! {
         name: max_values,
-        type_: SensorValuesV5,
         input: MAX_VALUES,
         acceleration_vector_as_milli_g: Some(AccelerationVector(32_767, 32_767, 32_767)),
         battery_potential_as_millivolts: Some(3_646),
