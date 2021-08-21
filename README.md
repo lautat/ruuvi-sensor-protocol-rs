@@ -16,7 +16,7 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ## Changes
 
-### `0.5.0` (unreleased)
+### `0.5.0`
 - Requires Rust `>= 1.48`
 - Adds `Clone` trait for `SensorValues` and `ParseError`
 - Use `AsRef<[u8]>` as type bound for value in `from_manufacturer_specific_data`
