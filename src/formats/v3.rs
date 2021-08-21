@@ -1,14 +1,9 @@
-use core::convert::{TryFrom, TryInto};
-
-use crate::{
-    errors::ParseError,
-    formats::{
-        traits::{
-            Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
-            MovementCounter, Pressure, Temperature, TransmitterPower,
-        },
-        AccelerationVector,
+use crate::formats::{
+    traits::{
+        Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
+        MovementCounter, Pressure, Temperature, TransmitterPower,
     },
+    AccelerationVector,
 };
 
 pub const VERSION: u8 = 3;
@@ -87,24 +82,6 @@ impl TransmitterPower for SensorValues {
     }
 }
 
-impl TryFrom<&[u8]> for SensorValues {
-    type Error = ParseError;
-
-    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let result: Result<&[u8; SIZE], _> = value.try_into();
-
-        if let Ok(value) = result {
-            Ok(Self::from(value))
-        } else {
-            Err(ParseError::InvalidValueLength(
-                VERSION,
-                value.len() + 1,
-                SIZE + 1,
-            ))
-        }
-    }
-}
-
 impl From<&[u8; SIZE]> for SensorValues {
     fn from(value: &[u8; SIZE]) -> Self {
         let [humidity, temperature_1, temperature_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, potential_1, potential_2] =
@@ -127,48 +104,27 @@ impl From<&[u8; SIZE]> for SensorValues {
 mod tests {
     use super::*;
 
-    const INPUT: &[u8] = &[
+    const INPUT: [u8; SIZE] = [
         0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
     ];
-    const NEGATIVE_INPUT: &[u8] = &[
+    const NEGATIVE_INPUT: [u8; SIZE] = [
         0x17, 0x81, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
     ];
 
-    crate::test_parser! {
-        name: invalid_input_length,
-        input: [103, 22, 50, 60, 70],
-        result: Err(ParseError::InvalidValueLength(
-            VERSION,
-            6,
-            SIZE + 1
-        )),
-    }
-
-    crate::test_parser! {
-        name: empty_input,
-        input: [],
-        result: Err(ParseError::InvalidValueLength(
-            VERSION,
-            1,
-            SIZE + 1
-        )),
-    }
-
-    crate::test_parser! {
-        name: valid_input,
-        input: INPUT,
-        result: Ok(SensorValues {
+    #[test]
+    fn valid_input() {
+        assert_eq!(SensorValues::from(&INPUT), SensorValues {
             humidity: 0x17,
             temperature: 0x0145,
             pressure: 0x3558,
             acceleration: AccelerationVector(1000, 1255, 1510),
             battery_potential: 0x0886
-        }),
+        })
     }
 
     crate::test_measurement_trait_methods! {
         name: positive_inputs,
-        input: INPUT,
+        values: SensorValues::from(&INPUT),
         acceleration_vector_as_milli_g: Some(AccelerationVector(1000, 1255, 1510)),
         battery_potential_as_millivolts: Some(2182),
         humidity_as_ppm: Some(115_000),
@@ -182,7 +138,7 @@ mod tests {
 
     crate::test_measurement_trait_methods! {
         name: negative_inputs,
-        input: NEGATIVE_INPUT,
+        values: SensorValues::from(&NEGATIVE_INPUT),
         acceleration_vector_as_milli_g: Some(AccelerationVector(-1000, -1255, -1510)),
         temperature_as_millicelsius: Some(-1690),
     }

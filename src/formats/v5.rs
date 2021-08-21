@@ -1,14 +1,9 @@
-use core::convert::{TryFrom, TryInto};
-
-use crate::{
-    errors::ParseError,
-    formats::{
-        traits::{
-            Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
-            MovementCounter, Pressure, Temperature, TransmitterPower,
-        },
-        AccelerationVector,
+use crate::formats::{
+    traits::{
+        Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
+        MovementCounter, Pressure, Temperature, TransmitterPower,
     },
+    AccelerationVector,
 };
 
 pub const VERSION: u8 = 5;
@@ -125,24 +120,6 @@ impl TransmitterPower for SensorValues {
     }
 }
 
-impl TryFrom<&[u8]> for SensorValues {
-    type Error = ParseError;
-
-    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let result: Result<&[u8; SIZE], _> = value.try_into();
-
-        if let Ok(value) = result {
-            Ok(Self::from(value))
-        } else {
-            Err(ParseError::InvalidValueLength(
-                VERSION,
-                value.len() + 1,
-                SIZE + 1,
-            ))
-        }
-    }
-}
-
 impl From<&[u8; SIZE]> for SensorValues {
     fn from(value: &[u8; SIZE]) -> Self {
         let [temperature_1, temperature_2, humidity_1, humidity_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, power_1, power_2, movement_counter, measurement_sequence_number_1, measurement_sequence_number_2, mac_1, mac_2, mac_3, mac_4, mac_5, mac_6] =
@@ -190,30 +167,9 @@ mod tests {
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     ];
 
-    crate::test_parser! {
-        name: invalid_input_length,
-        input: [103, 22, 50, 60, 70],
-        result: Err(ParseError::InvalidValueLength(
-            VERSION,
-            6,
-            SIZE + 1
-        )),
-    }
-
-    crate::test_parser! {
-        name: empty_input,
-        input: [],
-        result: Err(ParseError::InvalidValueLength(
-            VERSION,
-            1,
-            SIZE + 1
-        )),
-    }
-
-    crate::test_parser! {
-        name: valid_input,
-        input: VALID_VALUES,
-        result: Ok(SensorValues {
+    #[test]
+    fn valid_input() {
+        assert_eq!(SensorValues::from(&VALID_VALUES), SensorValues {
             humidity: 0x5394,
             temperature: 0x12FC,
             pressure: 0xC37C,
@@ -222,12 +178,12 @@ mod tests {
             movement_counter: 0x42,
             measurement_sequence_number: 0xCD,
             mac_address: [0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F],
-        }),
+        });
     }
 
     crate::test_measurement_trait_methods! {
         name: valid_values,
-        input: VALID_VALUES,
+        values: SensorValues::from(&VALID_VALUES),
         acceleration_vector_as_milli_g: Some(AccelerationVector(4, -4, 1_036)),
         battery_potential_as_millivolts: Some(2_977),
         humidity_as_ppm: Some(534_900),
@@ -241,7 +197,7 @@ mod tests {
 
     crate::test_measurement_trait_methods! {
         name: invalid_values,
-        input: INVALID_VALUES,
+        values: SensorValues::from(&INVALID_VALUES),
         acceleration_vector_as_milli_g: None,
         battery_potential_as_millivolts: None,
         humidity_as_ppm: None,
@@ -255,7 +211,7 @@ mod tests {
 
     crate::test_measurement_trait_methods! {
         name: min_values,
-        input: MIN_VALUES,
+        values: SensorValues::from(&MIN_VALUES),
         acceleration_vector_as_milli_g: Some(AccelerationVector(-32_767, -32_767, -32_767)),
         battery_potential_as_millivolts: Some(1_600),
         humidity_as_ppm: Some(0),
@@ -268,7 +224,7 @@ mod tests {
 
     crate::test_measurement_trait_methods! {
         name: max_values,
-        input: MAX_VALUES,
+        values: SensorValues::from(&MAX_VALUES),
         acceleration_vector_as_milli_g: Some(AccelerationVector(32_767, 32_767, 32_767)),
         battery_potential_as_millivolts: Some(3_646),
         humidity_as_ppm: Some(1_638_350),

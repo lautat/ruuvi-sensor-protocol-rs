@@ -1,4 +1,4 @@
-use core::convert::TryFrom;
+use core::convert::TryInto;
 
 use crate::{
     errors::ParseError,
@@ -60,12 +60,32 @@ impl SensorValues {
     ) -> Result<Self, ParseError> {
         match (id, value.as_ref()) {
             (0x0499, [3, data @ ..]) => {
-                let values = v3::SensorValues::try_from(data)?;
-                Ok(Self::from(&values))
+                let result: Result<&[u8; v3::SIZE], _> = data.try_into();
+
+                if let Ok(data) = result {
+                    let values: &v3::SensorValues = &data.into();
+                    Ok(values.into())
+                } else {
+                    Err(ParseError::InvalidValueLength(
+                        v3::VERSION,
+                        data.len() + 1,
+                        v3::SIZE + 1,
+                    ))
+                }
             }
             (0x0499, [5, data @ ..]) => {
-                let values = v5::SensorValues::try_from(data)?;
-                Ok(Self::from(&values))
+                let result: Result<&[u8; v5::SIZE], _> = data.try_into();
+
+                if let Ok(data) = result {
+                    let values: &v5::SensorValues = &data.into();
+                    Ok(values.into())
+                } else {
+                    Err(ParseError::InvalidValueLength(
+                        v5::VERSION,
+                        data.len() + 1,
+                        v5::SIZE + 1,
+                    ))
+                }
             }
             (0x0499, [version, ..]) => Err(ParseError::UnsupportedFormatVersion(*version)),
             (0x0499, []) => Err(ParseError::EmptyValue),
@@ -194,20 +214,27 @@ mod tests {
     macro_rules! test_format_version {
         (
             name: $name: ident,
-            version: $version: literal,
             input: $input: expr,
             result: $result: expr,
         ) => {
             mod $name {
                 use super::*;
 
+                const VERSION: u8 = crate::formats::$name::VERSION;
+                const SIZE: usize = crate::formats::$name::SIZE + 1;
                 const INPUT: &[u8] = $input;
                 const RESULT: SensorValues = $result;
 
                 test_parser! {
                     name: input_with_invalid_length,
                     input: (0x0499, &INPUT[..8]),
-                    result: Err(ParseError::InvalidValueLength($version, 8, INPUT.len())),
+                    result: Err(ParseError::InvalidValueLength(VERSION, 8, SIZE)),
+                }
+
+                test_parser! {
+                    name: missing_data,
+                    input: (0x0499, &[VERSION]),
+                    result: Err(ParseError::InvalidValueLength(VERSION, 1, SIZE)),
                 }
 
                 test_parser! {
@@ -217,6 +244,7 @@ mod tests {
                 }
 
                 crate::test_measurement_trait_methods! {
+                    name: trait_methods,
                     values: RESULT,
                     acceleration_vector_as_milli_g: RESULT.acceleration,
                     battery_potential_as_millivolts: RESULT.battery_potential,
@@ -234,7 +262,6 @@ mod tests {
 
     test_format_version! {
         name: v3,
-        version: 3,
         input: &[3, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86],
         result: SensorValues {
             acceleration: Some(AccelerationVector(1000, 1255, 1510)),
@@ -251,7 +278,6 @@ mod tests {
 
     test_format_version! {
         name: v5,
-        version: 5,
         input: &[
             0x05, 0x12, 0xFC, 0x53, 0x94, 0xC3, 0x7C, 0x00, 0x04, 0xFF, 0xFC, 0x04, 0x0C, 0xAC,
             0x36, 0x42, 0x00, 0xCD, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
