@@ -62,32 +62,10 @@ impl SensorValues {
     ) -> Result<Self, ParseError> {
         match (id, value.as_ref()) {
             (MANUFACTURER_DATA_ID, [v3::VERSION, data @ ..]) => {
-                let result: Result<&[u8; v3::SIZE], _> = data.try_into();
-
-                if let Ok(data) = result {
-                    let values: &v3::SensorValues = &data.into();
-                    Ok(values.into())
-                } else {
-                    Err(ParseError::InvalidValueLength(
-                        v3::VERSION,
-                        data.len() + 1,
-                        v3::SIZE + 1,
-                    ))
-                }
+                parse_format_version::<v3::SensorValues, { v3::SIZE }>(v3::VERSION, data)
             }
             (MANUFACTURER_DATA_ID, [v5::VERSION, data @ ..]) => {
-                let result: Result<&[u8; v5::SIZE], _> = data.try_into();
-
-                if let Ok(data) = result {
-                    let values: &v5::SensorValues = &data.into();
-                    Ok(values.into())
-                } else {
-                    Err(ParseError::InvalidValueLength(
-                        v5::VERSION,
-                        data.len() + 1,
-                        v5::SIZE + 1,
-                    ))
-                }
+                parse_format_version::<v5::SensorValues, { v5::SIZE }>(v5::VERSION, data)
             }
             (MANUFACTURER_DATA_ID, [version, ..]) => {
                 Err(ParseError::UnsupportedFormatVersion(*version))
@@ -95,6 +73,36 @@ impl SensorValues {
             (MANUFACTURER_DATA_ID, []) => Err(ParseError::EmptyValue),
             (id, _) => Err(ParseError::UnknownManufacturerId(id)),
         }
+    }
+}
+
+fn parse_format_version<'a, V, const N: usize>(
+    version: u8,
+    data: &'a [u8],
+) -> Result<SensorValues, ParseError>
+where
+    V: From<&'a [u8; N]>
+        + Acceleration
+        + BatteryPotential
+        + Humidity
+        + MacAddress
+        + MeasurementSequenceNumber
+        + MovementCounter
+        + Pressure
+        + Temperature
+        + TransmitterPower,
+{
+    let result: Result<&[u8; N], _> = data.try_into();
+
+    if let Ok(data) = result {
+        let values: &V = &data.into();
+        Ok(values.into())
+    } else {
+        Err(ParseError::InvalidValueLength(
+            version,
+            data.len() + 1,
+            N + 1,
+        ))
     }
 }
 
