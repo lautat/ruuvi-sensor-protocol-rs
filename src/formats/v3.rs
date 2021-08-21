@@ -113,13 +113,16 @@ mod tests {
 
     #[test]
     fn valid_input() {
-        assert_eq!(SensorValues::from(&INPUT), SensorValues {
-            humidity: 0x17,
-            temperature: 0x0145,
-            pressure: 0x3558,
-            acceleration: AccelerationVector(1000, 1255, 1510),
-            battery_potential: 0x0886
-        })
+        assert_eq!(
+            SensorValues::from(&INPUT),
+            SensorValues {
+                humidity: 0x17,
+                temperature: 0x0145,
+                pressure: 0x3558,
+                acceleration: AccelerationVector(1000, 1255, 1510),
+                battery_potential: 0x0886
+            }
+        )
     }
 
     crate::test_measurement_trait_methods! {

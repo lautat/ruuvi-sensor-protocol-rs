@@ -169,16 +169,19 @@ mod tests {
 
     #[test]
     fn valid_input() {
-        assert_eq!(SensorValues::from(&VALID_VALUES), SensorValues {
-            humidity: 0x5394,
-            temperature: 0x12FC,
-            pressure: 0xC37C,
-            acceleration: [4, -4, 1036],
-            power_info: 0xAC36,
-            movement_counter: 0x42,
-            measurement_sequence_number: 0xCD,
-            mac_address: [0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F],
-        });
+        assert_eq!(
+            SensorValues::from(&VALID_VALUES),
+            SensorValues {
+                humidity: 0x5394,
+                temperature: 0x12FC,
+                pressure: 0xC37C,
+                acceleration: [4, -4, 1036],
+                power_info: 0xAC36,
+                movement_counter: 0x42,
+                measurement_sequence_number: 0xCD,
+                mac_address: [0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F],
+            }
+        );
     }
 
     crate::test_measurement_trait_methods! {

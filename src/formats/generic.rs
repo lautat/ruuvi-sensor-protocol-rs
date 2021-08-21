@@ -89,7 +89,9 @@ impl SensorValues {
                     ))
                 }
             }
-            (MANUFACTURER_DATA_ID, [version, ..]) => Err(ParseError::UnsupportedFormatVersion(*version)),
+            (MANUFACTURER_DATA_ID, [version, ..]) => {
+                Err(ParseError::UnsupportedFormatVersion(*version))
+            }
             (MANUFACTURER_DATA_ID, []) => Err(ParseError::EmptyValue),
             (id, _) => Err(ParseError::UnknownManufacturerId(id)),
         }
