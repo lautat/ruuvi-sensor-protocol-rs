@@ -183,6 +183,8 @@ where
 mod tests {
     use super::*;
 
+    use crate::formats::testing::test_measurement_trait_methods;
+
     macro_rules! test_parser {
         (
             name: $name: ident,
@@ -247,7 +249,7 @@ mod tests {
                     result: Ok(RESULT),
                 }
 
-                crate::test_measurement_trait_methods! {
+                test_measurement_trait_methods! {
                     name: trait_methods,
                     values: RESULT,
                     acceleration_vector_as_milli_g: RESULT.acceleration,

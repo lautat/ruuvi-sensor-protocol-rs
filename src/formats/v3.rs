@@ -104,6 +104,8 @@ impl From<&[u8; SIZE]> for SensorValues {
 mod tests {
     use super::*;
 
+    use crate::formats::testing::test_measurement_trait_methods;
+
     const INPUT: [u8; SIZE] = [
         0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
     ];
@@ -125,7 +127,7 @@ mod tests {
         )
     }
 
-    crate::test_measurement_trait_methods! {
+    test_measurement_trait_methods! {
         name: positive_inputs,
         values: SensorValues::from(&INPUT),
         acceleration_vector_as_milli_g: Some(AccelerationVector(1000, 1255, 1510)),
@@ -139,7 +141,7 @@ mod tests {
         tx_power_as_dbm: None,
     }
 
-    crate::test_measurement_trait_methods! {
+    test_measurement_trait_methods! {
         name: negative_inputs,
         values: SensorValues::from(&NEGATIVE_INPUT),
         acceleration_vector_as_milli_g: Some(AccelerationVector(-1000, -1255, -1510)),

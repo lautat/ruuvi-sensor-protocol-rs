@@ -148,6 +148,8 @@ impl From<&[u8; SIZE]> for SensorValues {
 mod tests {
     use super::*;
 
+    use crate::formats::testing::test_measurement_trait_methods;
+
     // These test vectors are from the protocol specification
     // https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_05.md
     const VALID_VALUES: [u8; 23] = [
@@ -184,7 +186,7 @@ mod tests {
         );
     }
 
-    crate::test_measurement_trait_methods! {
+    test_measurement_trait_methods! {
         name: valid_values,
         values: SensorValues::from(&VALID_VALUES),
         acceleration_vector_as_milli_g: Some(AccelerationVector(4, -4, 1_036)),
@@ -198,7 +200,7 @@ mod tests {
         tx_power_as_dbm: Some(4),
     }
 
-    crate::test_measurement_trait_methods! {
+    test_measurement_trait_methods! {
         name: invalid_values,
         values: SensorValues::from(&INVALID_VALUES),
         acceleration_vector_as_milli_g: None,
@@ -212,7 +214,7 @@ mod tests {
         tx_power_as_dbm: None,
     }
 
-    crate::test_measurement_trait_methods! {
+    test_measurement_trait_methods! {
         name: min_values,
         values: SensorValues::from(&MIN_VALUES),
         acceleration_vector_as_milli_g: Some(AccelerationVector(-32_767, -32_767, -32_767)),
@@ -225,7 +227,7 @@ mod tests {
         tx_power_as_dbm: Some(-40),
     }
 
-    crate::test_measurement_trait_methods! {
+    test_measurement_trait_methods! {
         name: max_values,
         values: SensorValues::from(&MAX_VALUES),
         acceleration_vector_as_milli_g: Some(AccelerationVector(32_767, 32_767, 32_767)),

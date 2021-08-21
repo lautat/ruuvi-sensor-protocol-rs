@@ -1,4 +1,3 @@
-#[macro_export]
 macro_rules! test_measurement_trait_methods {
     (
         name: $name: ident,
@@ -18,3 +17,5 @@ macro_rules! test_measurement_trait_methods {
         }
     };
 }
+
+pub(crate) use test_measurement_trait_methods;
