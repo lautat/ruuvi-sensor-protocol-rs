@@ -128,23 +128,27 @@ mod tests {
     }
 
     test_measurement_trait_methods! {
-        name: positive_inputs,
-        values: SensorValues::from(&INPUT),
-        acceleration_vector_as_milli_g: Some(AccelerationVector(1000, 1255, 1510)),
-        battery_potential_as_millivolts: Some(2182),
-        humidity_as_ppm: Some(115_000),
-        mac_address: None,
-        measurement_sequence_number: None,
-        movement_counter: None,
-        pressure_as_pascals: Some(63_656),
-        temperature_as_millicelsius: Some(1690),
-        tx_power_as_dbm: None,
-    }
+        test positive_inputs {
+            values: SensorValues::from(&INPUT),
+            expected: {
+                acceleration_vector_as_milli_g: Some(AccelerationVector(1000, 1255, 1510)),
+                battery_potential_as_millivolts: Some(2182),
+                humidity_as_ppm: Some(115_000),
+                mac_address: None,
+                measurement_sequence_number: None,
+                movement_counter: None,
+                pressure_as_pascals: Some(63_656),
+                temperature_as_millicelsius: Some(1690),
+                tx_power_as_dbm: None,
+            },
+        }
 
-    test_measurement_trait_methods! {
-        name: negative_inputs,
-        values: SensorValues::from(&NEGATIVE_INPUT),
-        acceleration_vector_as_milli_g: Some(AccelerationVector(-1000, -1255, -1510)),
-        temperature_as_millicelsius: Some(-1690),
+        test negative_inputs {
+            values: SensorValues::from(&NEGATIVE_INPUT),
+            expected: {
+                acceleration_vector_as_milli_g: Some(AccelerationVector(-1000, -1255, -1510)),
+                temperature_as_millicelsius: Some(-1690),
+            },
+        }
     }
 }

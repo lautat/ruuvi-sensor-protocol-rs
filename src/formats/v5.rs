@@ -187,56 +187,62 @@ mod tests {
     }
 
     test_measurement_trait_methods! {
-        name: valid_values,
-        values: SensorValues::from(&VALID_VALUES),
-        acceleration_vector_as_milli_g: Some(AccelerationVector(4, -4, 1_036)),
-        battery_potential_as_millivolts: Some(2_977),
-        humidity_as_ppm: Some(534_900),
-        mac_address: Some([0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F]),
-        measurement_sequence_number: Some(205),
-        movement_counter: Some(66),
-        pressure_as_pascals: Some(100_044),
-        temperature_as_millicelsius: Some(24_300),
-        tx_power_as_dbm: Some(4),
-    }
+        test valid_values {
+            values: SensorValues::from(&VALID_VALUES),
+            expected: {
+                acceleration_vector_as_milli_g: Some(AccelerationVector(4, -4, 1_036)),
+                battery_potential_as_millivolts: Some(2_977),
+                humidity_as_ppm: Some(534_900),
+                mac_address: Some([0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F]),
+                measurement_sequence_number: Some(205),
+                movement_counter: Some(66),
+                pressure_as_pascals: Some(100_044),
+                temperature_as_millicelsius: Some(24_300),
+                tx_power_as_dbm: Some(4),
+            },
+        }
 
-    test_measurement_trait_methods! {
-        name: invalid_values,
-        values: SensorValues::from(&INVALID_VALUES),
-        acceleration_vector_as_milli_g: None,
-        battery_potential_as_millivolts: None,
-        humidity_as_ppm: None,
-        mac_address: None,
-        measurement_sequence_number: None,
-        movement_counter: None,
-        pressure_as_pascals: None,
-        temperature_as_millicelsius: None,
-        tx_power_as_dbm: None,
-    }
+        test invalid_values {
+            values: SensorValues::from(&INVALID_VALUES),
+            expected: {
+                acceleration_vector_as_milli_g: None,
+                battery_potential_as_millivolts: None,
+                humidity_as_ppm: None,
+                mac_address: None,
+                measurement_sequence_number: None,
+                movement_counter: None,
+                pressure_as_pascals: None,
+                temperature_as_millicelsius: None,
+                tx_power_as_dbm: None,
+            },
+        }
 
-    test_measurement_trait_methods! {
-        name: min_values,
-        values: SensorValues::from(&MIN_VALUES),
-        acceleration_vector_as_milli_g: Some(AccelerationVector(-32_767, -32_767, -32_767)),
-        battery_potential_as_millivolts: Some(1_600),
-        humidity_as_ppm: Some(0),
-        measurement_sequence_number: Some(0),
-        movement_counter: Some(0),
-        pressure_as_pascals: Some(50_000),
-        temperature_as_millicelsius: Some(-163_835),
-        tx_power_as_dbm: Some(-40),
-    }
+        test min_values {
+            values: SensorValues::from(&MIN_VALUES),
+            expected: {
+                acceleration_vector_as_milli_g: Some(AccelerationVector(-32_767, -32_767, -32_767)),
+                battery_potential_as_millivolts: Some(1_600),
+                humidity_as_ppm: Some(0),
+                measurement_sequence_number: Some(0),
+                movement_counter: Some(0),
+                pressure_as_pascals: Some(50_000),
+                temperature_as_millicelsius: Some(-163_835),
+                tx_power_as_dbm: Some(-40),
+            },
+        }
 
-    test_measurement_trait_methods! {
-        name: max_values,
-        values: SensorValues::from(&MAX_VALUES),
-        acceleration_vector_as_milli_g: Some(AccelerationVector(32_767, 32_767, 32_767)),
-        battery_potential_as_millivolts: Some(3_646),
-        humidity_as_ppm: Some(1_638_350),
-        measurement_sequence_number: Some(65_534),
-        movement_counter: Some(254),
-        pressure_as_pascals: Some(115_534),
-        temperature_as_millicelsius: Some(163_835),
-        tx_power_as_dbm: Some(20),
+        test max_values {
+            values: SensorValues::from(&MAX_VALUES),
+            expected: {
+                acceleration_vector_as_milli_g: Some(AccelerationVector(32_767, 32_767, 32_767)),
+                battery_potential_as_millivolts: Some(3_646),
+                humidity_as_ppm: Some(1_638_350),
+                measurement_sequence_number: Some(65_534),
+                movement_counter: Some(254),
+                pressure_as_pascals: Some(115_534),
+                temperature_as_millicelsius: Some(163_835),
+                tx_power_as_dbm: Some(20),
+            },
+        }
     }
 }

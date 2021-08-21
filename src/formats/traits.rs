@@ -68,61 +68,61 @@ mod tests {
         }
     }
 
-    macro_rules! test_kelvins_to_celcius_conversion {
+    macro_rules! test_kelvins_to_celcius_conversions {
         (
-            test_name: $name: ident,
-            milli_kelvins: $milli_kelvins: expr,
-            milli_celsius: $milli_celsius: expr,
+            $(
+                test $name: ident {
+                    millikelvins: $millikelvins: expr,
+                    millicelsius: $millicelsius: expr,
+                }
+            )+
         ) => {
-            #[test]
-            fn $name() {
-                let value = Value {
-                    temperature: $milli_kelvins,
-                };
-                assert_eq!(value.temperature_as_millicelsius(), $milli_celsius);
-            }
+            $(
+                #[test]
+                fn $name() {
+                    let value = Value {
+                        temperature: $millikelvins,
+                    };
+                    assert_eq!(value.temperature_as_millicelsius(), $millicelsius);
+                }
+            )+
         };
     }
 
-    test_kelvins_to_celcius_conversion! {
-        test_name: zero_kelvins,
-        milli_kelvins: Some(0),
-        milli_celsius: Some(-273_150),
-    }
+    test_kelvins_to_celcius_conversions! {
+        test zero_kelvins {
+            millikelvins: Some(0),
+            millicelsius: Some(-273_150),
+        }
 
-    test_kelvins_to_celcius_conversion! {
-        test_name: zero_celsius,
-        milli_kelvins: Some(273_150),
-        milli_celsius: Some(0),
-    }
+        test zero_celsius {
+            millikelvins: Some(273_150),
+            millicelsius: Some(0),
+        }
 
-    test_kelvins_to_celcius_conversion! {
-        test_name: sub_zero_celsius_1,
-        milli_kelvins: Some(263_080),
-        milli_celsius: Some(-10_070),
-    }
+        test sub_zero_celsius_1 {
+            millikelvins: Some(263_080),
+            millicelsius: Some(-10_070),
+        }
 
-    test_kelvins_to_celcius_conversion! {
-        test_name: sub_zero_celsius_2,
-        milli_kelvins: Some(194_924),
-        milli_celsius: Some(-78_226),
-    }
+        test sub_zero_celsius_2 {
+            millikelvins: Some(194_924),
+            millicelsius: Some(-78_226),
+        }
 
-    test_kelvins_to_celcius_conversion! {
-        test_name: above_zero_celsius_1,
-        milli_kelvins: Some(4343_934),
-        milli_celsius: Some(4070_784),
-    }
+        test above_zero_celsius_1 {
+            millikelvins: Some(4343_934),
+            millicelsius: Some(4070_784),
+        }
 
-    test_kelvins_to_celcius_conversion! {
-        test_name: above_zero_celsius_2,
-        milli_kelvins: Some(291_655),
-        milli_celsius: Some(18_505),
-    }
+        test above_zero_celsius_2 {
+            millikelvins: Some(291_655),
+            millicelsius: Some(18_505),
+        }
 
-    test_kelvins_to_celcius_conversion! {
-        test_name: no_temperature,
-        milli_kelvins: None,
-        milli_celsius: None,
+        test no_temperature {
+            millikelvins: None,
+            millicelsius: None,
+        }
     }
 }
