@@ -34,6 +34,8 @@ pub struct SensorValues {
     mac_address: Option<[u8; 6]>,
 }
 
+const MANUFACTURER_DATA_ID: u16 = 0x0499;
+
 impl SensorValues {
     /// Parses sensor values from the payload encoded in manufacturer specific data -field. The
     /// function returns a `ParseError` if the `id` does not match the exptected `id` in the
@@ -59,7 +61,7 @@ impl SensorValues {
         value: impl AsRef<[u8]>,
     ) -> Result<Self, ParseError> {
         match (id, value.as_ref()) {
-            (0x0499, [3, data @ ..]) => {
+            (MANUFACTURER_DATA_ID, [v3::VERSION, data @ ..]) => {
                 let result: Result<&[u8; v3::SIZE], _> = data.try_into();
 
                 if let Ok(data) = result {
@@ -73,7 +75,7 @@ impl SensorValues {
                     ))
                 }
             }
-            (0x0499, [5, data @ ..]) => {
+            (MANUFACTURER_DATA_ID, [v5::VERSION, data @ ..]) => {
                 let result: Result<&[u8; v5::SIZE], _> = data.try_into();
 
                 if let Ok(data) = result {
@@ -87,8 +89,8 @@ impl SensorValues {
                     ))
                 }
             }
-            (0x0499, [version, ..]) => Err(ParseError::UnsupportedFormatVersion(*version)),
-            (0x0499, []) => Err(ParseError::EmptyValue),
+            (MANUFACTURER_DATA_ID, [version, ..]) => Err(ParseError::UnsupportedFormatVersion(*version)),
+            (MANUFACTURER_DATA_ID, []) => Err(ParseError::EmptyValue),
             (id, _) => Err(ParseError::UnknownManufacturerId(id)),
         }
     }
@@ -201,13 +203,13 @@ mod tests {
 
     test_parser! {
         name: unsupported_format,
-        input: (0x0499, [0, 1, 2, 3]),
+        input: (MANUFACTURER_DATA_ID, [0, 1, 2, 3]),
         result: Err(ParseError::UnsupportedFormatVersion(0)),
     }
 
     test_parser! {
         name: empty_data,
-        input: (0x0499, []),
+        input: (MANUFACTURER_DATA_ID, []),
         result: Err(ParseError::EmptyValue),
     }
 
@@ -227,19 +229,19 @@ mod tests {
 
                 test_parser! {
                     name: input_with_invalid_length,
-                    input: (0x0499, &INPUT[..8]),
+                    input: (MANUFACTURER_DATA_ID, &INPUT[..8]),
                     result: Err(ParseError::InvalidValueLength(VERSION, 8, SIZE)),
                 }
 
                 test_parser! {
                     name: missing_data,
-                    input: (0x0499, &[VERSION]),
+                    input: (MANUFACTURER_DATA_ID, &[VERSION]),
                     result: Err(ParseError::InvalidValueLength(VERSION, 1, SIZE)),
                 }
 
                 test_parser! {
                     name: valid_input,
-                    input: (0x0499, INPUT),
+                    input: (MANUFACTURER_DATA_ID, INPUT),
                     result: Ok(RESULT),
                 }
 
