@@ -16,6 +16,8 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ## Changes
 
+### `0.5.1` (unreleased)
+
 ### `0.5.0`
 - Requires Rust `>= 1.48`
 - Adds `Clone` trait for `SensorValues` and `ParseError`
