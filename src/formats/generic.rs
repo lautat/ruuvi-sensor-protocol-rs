@@ -193,6 +193,11 @@ mod tests {
 
     use crate::formats::testing::test_measurement_trait_methods;
 
+    #[test]
+    fn sensor_values_has_default_traits() {
+        crate::testing::type_has_default_traits::<SensorValues>();
+    }
+
     macro_rules! test_parser {
         (
             $(

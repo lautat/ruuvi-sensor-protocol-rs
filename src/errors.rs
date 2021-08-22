@@ -41,3 +41,13 @@ impl Display for ParseError {
 
 #[cfg(feature = "std")]
 impl Error for ParseError {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_error_has_default_traits() {
+        crate::testing::type_has_default_traits::<ParseError>();
+    }
+}

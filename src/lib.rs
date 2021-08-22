@@ -62,3 +62,6 @@ pub use crate::{
 
 mod errors;
 mod formats;
+
+#[cfg(test)]
+mod testing;

@@ -17,3 +17,13 @@ mod v5;
 
 #[cfg(test)]
 mod testing;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn acceleration_vector_has_default_traits() {
+        crate::testing::type_has_default_traits::<AccelerationVector>();
+    }
+}
