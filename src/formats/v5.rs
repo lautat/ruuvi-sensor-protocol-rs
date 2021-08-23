@@ -1,7 +1,7 @@
 use crate::formats::{
     traits::{
         Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
-        MovementCounter, Pressure, Temperature, TransmitterPower,
+        MovementCounter, Pressure, ProtocolPayload, Temperature, TransmitterPower,
     },
     AccelerationVector,
 };
@@ -119,6 +119,8 @@ impl TransmitterPower for SensorValues {
         }
     }
 }
+
+impl ProtocolPayload for SensorValues {}
 
 impl From<&[u8; SIZE]> for SensorValues {
     fn from(value: &[u8; SIZE]) -> Self {

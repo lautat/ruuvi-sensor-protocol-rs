@@ -54,6 +54,19 @@ pub trait TransmitterPower {
     fn tx_power_as_dbm(&self) -> Option<i8>;
 }
 
+pub trait ProtocolPayload:
+    Acceleration
+    + BatteryPotential
+    + Humidity
+    + MacAddress
+    + MeasurementSequenceNumber
+    + MovementCounter
+    + Pressure
+    + Temperature
+    + TransmitterPower
+{
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

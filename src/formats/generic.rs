@@ -5,7 +5,7 @@ use crate::{
     formats::{
         traits::{
             Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
-            MovementCounter, Pressure, Temperature, TransmitterPower,
+            MovementCounter, Pressure, ProtocolPayload, Temperature, TransmitterPower,
         },
         v3, v5, AccelerationVector,
     },
@@ -81,16 +81,7 @@ fn parse_format_version<'a, V, const N: usize>(
     data: &'a [u8],
 ) -> Result<SensorValues, ParseError>
 where
-    V: From<&'a [u8; N]>
-        + Acceleration
-        + BatteryPotential
-        + Humidity
-        + MacAddress
-        + MeasurementSequenceNumber
-        + MovementCounter
-        + Pressure
-        + Temperature
-        + TransmitterPower,
+    V: From<&'a [u8; N]> + ProtocolPayload,
 {
     let result: Result<&[u8; N], _> = data.try_into();
 
@@ -160,18 +151,7 @@ impl TransmitterPower for SensorValues {
     }
 }
 
-impl<T> From<&T> for SensorValues
-where
-    T: Acceleration
-        + BatteryPotential
-        + Humidity
-        + MacAddress
-        + MeasurementSequenceNumber
-        + MovementCounter
-        + Pressure
-        + Temperature
-        + TransmitterPower,
-{
+impl<T: ProtocolPayload> From<&T> for SensorValues {
     fn from(values: &T) -> SensorValues {
         SensorValues {
             acceleration: values.acceleration_vector_as_milli_g(),
