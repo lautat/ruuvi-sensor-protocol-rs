@@ -62,10 +62,10 @@ impl SensorValues {
     ) -> Result<Self, ParseError> {
         match (id, value.as_ref()) {
             (MANUFACTURER_DATA_ID, [v3::SensorValues::VERSION, data @ ..]) => {
-                parse_format_version::<v3::SensorValues, { v3::SensorValues::SIZE }>(data)
+                Self::parse_format_version::<v3::SensorValues, { v3::SensorValues::SIZE }>(data)
             }
             (MANUFACTURER_DATA_ID, [v5::SensorValues::VERSION, data @ ..]) => {
-                parse_format_version::<v5::SensorValues, { v5::SensorValues::SIZE }>(data)
+                Self::parse_format_version::<v5::SensorValues, { v5::SensorValues::SIZE }>(data)
             }
             (MANUFACTURER_DATA_ID, [version, ..]) => {
                 Err(ParseError::UnsupportedFormatVersion(*version))
@@ -74,25 +74,37 @@ impl SensorValues {
             (id, _) => Err(ParseError::UnknownManufacturerId(id)),
         }
     }
-}
 
-fn parse_format_version<'a, V, const N: usize>(
-    data: &'a [u8],
-) -> Result<SensorValues, ParseError>
-where
-    V: From<&'a [u8; N]> + ProtocolPayload,
-{
-    let result: Result<&[u8; N], _> = data.try_into();
+    fn from_payload<T: ProtocolPayload>(values: &T) -> Self {
+        SensorValues {
+            acceleration: values.acceleration_vector_as_milli_g(),
+            battery_potential: values.battery_potential_as_millivolts(),
+            humidity: values.humidity_as_ppm(),
+            mac_address: values.mac_address(),
+            measurement_sequence_number: values.measurement_sequence_number(),
+            movement_counter: values.movement_counter(),
+            pressure: values.pressure_as_pascals(),
+            temperature: values.temperature_as_millikelvins(),
+            tx_power: values.tx_power_as_dbm(),
+        }
+    }
 
-    if let Ok(data) = result {
-        let values: &V = &data.into();
-        Ok(values.into())
-    } else {
-        Err(ParseError::InvalidValueLength(
-            V::VERSION,
-            data.len() + 1,
-            N + 1,
-        ))
+    fn parse_format_version<'a, V, const N: usize>(data: &'a [u8]) -> Result<Self, ParseError>
+    where
+        V: From<&'a [u8; N]> + ProtocolPayload,
+    {
+        let result: Result<&[u8; N], _> = data.try_into();
+
+        if let Ok(data) = result {
+            let values: &V = &data.into();
+            Ok(SensorValues::from_payload(values))
+        } else {
+            Err(ParseError::InvalidValueLength(
+                V::VERSION,
+                data.len() + 1,
+                N + 1,
+            ))
+        }
     }
 }
 
@@ -147,22 +159,6 @@ impl Temperature for SensorValues {
 impl TransmitterPower for SensorValues {
     fn tx_power_as_dbm(&self) -> Option<i8> {
         self.tx_power
-    }
-}
-
-impl<T: ProtocolPayload> From<&T> for SensorValues {
-    fn from(values: &T) -> SensorValues {
-        SensorValues {
-            acceleration: values.acceleration_vector_as_milli_g(),
-            battery_potential: values.battery_potential_as_millivolts(),
-            humidity: values.humidity_as_ppm(),
-            mac_address: values.mac_address(),
-            measurement_sequence_number: values.measurement_sequence_number(),
-            movement_counter: values.movement_counter(),
-            pressure: values.pressure_as_pascals(),
-            temperature: values.temperature_as_millikelvins(),
-            tx_power: values.tx_power_as_dbm(),
-        }
     }
 }
 
