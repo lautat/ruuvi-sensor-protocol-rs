@@ -61,11 +61,11 @@ impl SensorValues {
         value: impl AsRef<[u8]>,
     ) -> Result<Self, ParseError> {
         match (id, value.as_ref()) {
-            (MANUFACTURER_DATA_ID, [v3::VERSION, data @ ..]) => {
-                parse_format_version::<v3::SensorValues, { v3::SIZE }>(v3::VERSION, data)
+            (MANUFACTURER_DATA_ID, [v3::SensorValues::VERSION, data @ ..]) => {
+                parse_format_version::<v3::SensorValues, { v3::SensorValues::SIZE }>(data)
             }
-            (MANUFACTURER_DATA_ID, [v5::VERSION, data @ ..]) => {
-                parse_format_version::<v5::SensorValues, { v5::SIZE }>(v5::VERSION, data)
+            (MANUFACTURER_DATA_ID, [v5::SensorValues::VERSION, data @ ..]) => {
+                parse_format_version::<v5::SensorValues, { v5::SensorValues::SIZE }>(data)
             }
             (MANUFACTURER_DATA_ID, [version, ..]) => {
                 Err(ParseError::UnsupportedFormatVersion(*version))
@@ -77,7 +77,6 @@ impl SensorValues {
 }
 
 fn parse_format_version<'a, V, const N: usize>(
-    version: u8,
     data: &'a [u8],
 ) -> Result<SensorValues, ParseError>
 where
@@ -90,7 +89,7 @@ where
         Ok(values.into())
     } else {
         Err(ParseError::InvalidValueLength(
-            version,
+            V::VERSION,
             data.len() + 1,
             N + 1,
         ))
@@ -210,8 +209,8 @@ mod tests {
                 mod $name {
                     use super::*;
 
-                    const VERSION: u8 = crate::formats::$name::VERSION;
-                    const SIZE: usize = crate::formats::$name::SIZE + 1;
+                    const VERSION: u8 = crate::formats::$name::SensorValues::VERSION;
+                    const SIZE: usize = crate::formats::$name::SensorValues::SIZE + 1;
                     const INPUT: &[u8] = $input;
                     const RESULT: SensorValues = $result;
 

@@ -65,6 +65,8 @@ pub trait ProtocolPayload:
     + Temperature
     + TransmitterPower
 {
+    const VERSION: u8;
+    const SIZE: usize;
 }
 
 #[cfg(test)]

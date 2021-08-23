@@ -6,9 +6,6 @@ use crate::formats::{
     AccelerationVector,
 };
 
-pub const VERSION: u8 = 3;
-pub const SIZE: usize = 13;
-
 #[derive(Debug, PartialEq)]
 pub struct SensorValues {
     humidity: u8,
@@ -82,10 +79,13 @@ impl TransmitterPower for SensorValues {
     }
 }
 
-impl ProtocolPayload for SensorValues {}
+impl ProtocolPayload for SensorValues {
+    const VERSION: u8 = 3;
+    const SIZE: usize = 13;
+}
 
-impl From<&[u8; SIZE]> for SensorValues {
-    fn from(value: &[u8; SIZE]) -> Self {
+impl From<&[u8; Self::SIZE]> for SensorValues {
+    fn from(value: &[u8; Self::SIZE]) -> Self {
         let [humidity, temperature_1, temperature_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, potential_1, potential_2] =
             value;
         Self {
@@ -108,10 +108,10 @@ mod tests {
 
     use crate::formats::testing::test_measurement_trait_methods;
 
-    const INPUT: [u8; SIZE] = [
+    const INPUT: [u8; SensorValues::SIZE] = [
         0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08, 0x86,
     ];
-    const NEGATIVE_INPUT: [u8; SIZE] = [
+    const NEGATIVE_INPUT: [u8; SensorValues::SIZE] = [
         0x17, 0x81, 0x45, 0x35, 0x58, 0xFC, 0x18, 0xFB, 0x19, 0xFA, 0x1A, 0x08, 0x86,
     ];
 

@@ -6,9 +6,6 @@ use crate::formats::{
     AccelerationVector,
 };
 
-pub const VERSION: u8 = 5;
-pub const SIZE: usize = 23;
-
 /// Raw sensor values parsed from manufacturer data.
 #[derive(Debug, PartialEq)]
 pub struct SensorValues {
@@ -120,10 +117,13 @@ impl TransmitterPower for SensorValues {
     }
 }
 
-impl ProtocolPayload for SensorValues {}
+impl ProtocolPayload for SensorValues {
+    const VERSION: u8 = 5;
+    const SIZE: usize = 23;
+}
 
-impl From<&[u8; SIZE]> for SensorValues {
-    fn from(value: &[u8; SIZE]) -> Self {
+impl From<&[u8; Self::SIZE]> for SensorValues {
+    fn from(value: &[u8; Self::SIZE]) -> Self {
         let [temperature_1, temperature_2, humidity_1, humidity_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, power_1, power_2, movement_counter, measurement_sequence_number_1, measurement_sequence_number_2, mac_1, mac_2, mac_3, mac_4, mac_5, mac_6] =
             value;
         Self {
@@ -154,19 +154,19 @@ mod tests {
 
     // These test vectors are from the protocol specification
     // https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_05.md
-    const VALID_VALUES: [u8; 23] = [
+    const VALID_VALUES: [u8; SensorValues::SIZE] = [
         0x12, 0xFC, 0x53, 0x94, 0xC3, 0x7C, 0x00, 0x04, 0xFF, 0xFC, 0x04, 0x0C, 0xAC, 0x36, 0x42,
         0x00, 0xCD, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
     ];
-    const MAX_VALUES: [u8; 23] = [
+    const MAX_VALUES: [u8; SensorValues::SIZE] = [
         0x7F, 0xFF, 0xFF, 0xFE, 0xFF, 0xFE, 0x7F, 0xFF, 0x7F, 0xFF, 0x7F, 0xFF, 0xFF, 0xDE, 0xFE,
         0xFF, 0xFE, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
     ];
-    const MIN_VALUES: [u8; 23] = [
+    const MIN_VALUES: [u8; SensorValues::SIZE] = [
         0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x80, 0x01, 0x80, 0x01, 0x80, 0x01, 0x00, 0x00, 0x00,
         0x00, 0x00, 0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F,
     ];
-    const INVALID_VALUES: [u8; 23] = [
+    const INVALID_VALUES: [u8; SensorValues::SIZE] = [
         0x80, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0xFF, 0xFF, 0xFF,
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     ];
