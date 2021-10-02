@@ -49,6 +49,7 @@ See [`SensorValues`] documentation for a description of each value.
 [`SensorValues`]: crate::SensorValues
 */
 
+#![warn(rust_2018_idioms)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub use crate::{

@@ -17,7 +17,7 @@ pub enum ParseError {
 }
 
 impl Display for ParseError {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match self {
             ParseError::UnknownManufacturerId(id) => write!(
                 formatter,
