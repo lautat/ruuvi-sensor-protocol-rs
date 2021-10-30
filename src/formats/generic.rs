@@ -1,5 +1,3 @@
-use core::convert::TryInto;
-
 use crate::{
     errors::ParseError,
     formats::{

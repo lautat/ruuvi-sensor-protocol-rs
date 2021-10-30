@@ -3,7 +3,7 @@
 Ruuvi sensor protocol parser implementation
 
 ## Requirements
-- Rust `>= 1.48`
+- Rust `>= 1.56`
   - This crate can be compiled without `std` by disabling default features
 
 ## Crate Features
@@ -17,6 +17,7 @@ from source with `cargo doc`. Examples are included in the docs.
 ## Changes
 
 ### `0.6.0` (unreleased)
+- Requires 2021 Edition (Rust `>= 1.56`)
 
 ### `0.5.0`
 - Requires Rust `>= 1.48`
