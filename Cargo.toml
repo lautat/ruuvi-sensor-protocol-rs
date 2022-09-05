@@ -16,6 +16,19 @@ status = "passively-maintained"
 
 [features]
 default = ["std"]
+gateway = ["serde", "serde_json", "std"]
 std = []
 
 [dependencies]
+
+[dependencies.serde]
+default-features = false
+features = ["std", "derive"]
+optional = true
+version = "1.0.144"
+
+[dependencies.serde_json]
+default-features = false
+features = ["std"]
+optional = true
+version = "1.0.85"
