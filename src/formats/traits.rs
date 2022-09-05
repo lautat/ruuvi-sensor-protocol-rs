@@ -83,7 +83,7 @@ mod tests {
         }
     }
 
-    macro_rules! test_kelvins_to_celcius_conversions {
+    macro_rules! test_kelvins_to_celsius_conversions {
         (
             $(
                 test $name: ident {
@@ -104,7 +104,7 @@ mod tests {
         };
     }
 
-    test_kelvins_to_celcius_conversions! {
+    test_kelvins_to_celsius_conversions! {
         test zero_kelvins {
             millikelvins: Some(0),
             millicelsius: Some(-273_150),

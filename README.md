@@ -25,7 +25,7 @@ from source with `cargo doc`. Examples are included in the docs.
 - Use `AsRef<[u8]>` as type bound for value in `from_manufacturer_specific_data`
 
 ### `0.4.1`
-- Corrected `ZERO_CELCIUS_IN_MILLIKELVINS` constant
+- Corrected `ZERO_CELSIUS_IN_MILLIKELVINS` constant
 
 ### `0.4.0`
 - Requires Rust `>= 1.34`
