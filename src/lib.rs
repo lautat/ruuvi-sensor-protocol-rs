@@ -63,6 +63,8 @@ pub use crate::{
 
 mod errors;
 mod formats;
+#[cfg(feature = "gateway")]
+mod gateway;
 
 #[cfg(test)]
 mod testing;
