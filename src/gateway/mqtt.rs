@@ -1,7 +1,13 @@
 #[derive(serde::Deserialize, Debug)]
 struct MqttData {
-    #[serde(with = "hex")]
+    #[serde(deserialize_with = "deserialize_data")]
     data: Vec<u8>,
+}
+
+fn deserialize_data<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<Vec<u8>, D::Error> {
+    let data: Vec<u8> = hex::serde::deserialize(deserializer)?;
+
+    Ok(data)
 }
 
 #[cfg(test)]
