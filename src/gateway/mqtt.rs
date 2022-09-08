@@ -2,8 +2,10 @@ use serde::de::{Error, Unexpected};
 
 use crate::{gateway::data::{IterPackets, Packet}, SensorValues};
 
+/// MQTT Message payload sent by Ruuvi Gateway
 #[derive(serde::Deserialize, Debug)]
 pub struct MqttData {
+    /// RuuviTag sensor values parsed from the message payload
     #[serde(deserialize_with = "deserialize_data")]
     pub data: SensorValues,
 }
