@@ -78,7 +78,7 @@ mod tests {
                     #[test]
                     fn $name() {
                         let data = $input;
-                        let packet = Packet::try_from(data.as_slice());
+                        let packet = Packet::try_from(data.as_ref());
                         assert_eq!(packet, $result);
                     }
                 )+
@@ -104,7 +104,7 @@ mod tests {
                     #[test]
                     fn $name() {
                         let data = $input;
-                        let mut iter = IterPackets::new(data.as_slice());
+                        let mut iter = IterPackets::new(data.as_ref());
 
                         $(
                             assert_eq!(iter.next(), $result);
