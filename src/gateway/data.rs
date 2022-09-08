@@ -1,3 +1,5 @@
+use std::convert::TryFrom;
+
 pub struct IterPackets<'a> {
     data: &'a [u8],
     index: usize,
@@ -21,7 +23,7 @@ impl<'a> Iterator for IterPackets<'a> {
 
             if end <= self.data.len() {
                 self.index = end;
-                Some(Ok(Packet::from(&self.data[start..end])))
+                Some(Packet::try_from(&self.data[start..end]))
             } else {
                 self.index = self.data.len();
                 Some(Err(InvalidPacket))
@@ -39,12 +41,14 @@ pub enum Packet<'a> {
     Other(u8, &'a [u8]),
 }
 
-impl<'a> From<&'a [u8]> for Packet<'a> {
-    fn from(data: &'a [u8]) -> Self {
+impl<'a> TryFrom<&'a [u8]> for Packet<'a> {
+    type Error = InvalidPacket;
+
+    fn try_from(data: &'a [u8]) -> Result<Self, Self::Error> {
         match data {
-            [] => Self::Empty,
-            [0xFF, data @ ..] => Self::ManufacturerData(data),
-            [typ, data @ ..] => Self::Other(*typ, data),
+            [] => Ok(Self::Empty),
+            [0xFF, data @ ..] => Ok(Self::ManufacturerData(data)),
+            [typ, data @ ..] => Ok(Self::Other(*typ, data)),
         }
     }
 }
@@ -72,7 +76,7 @@ mod tests {
                     #[test]
                     fn $name() {
                         let data = $input;
-                        let packet = Packet::from(data.as_slice());
+                        let packet = Packet::try_from(data.as_slice());
                         assert_eq!(packet, $result);
                     }
                 )+
@@ -112,37 +116,37 @@ mod tests {
     test_packet_from_slice! {
         test empty_slice {
             input: [],
-            result: Packet::Empty,
+            result: Ok(Packet::Empty),
         }
 
         test manufacturer_data_1 {
             input: [0xFF],
-            result: Packet::ManufacturerData(&[]),
+            result: Ok(Packet::ManufacturerData(&[])),
         }
 
         test manufacturer_data_2 {
             input: [0xFF, 0x00, 0x01],
-            result: Packet::ManufacturerData(&[0x00, 0x01]),
+            result: Ok(Packet::ManufacturerData(&[0x00, 0x01])),
         }
 
         test manufacturer_data_3 {
             input: [0xFF, 0xAB, 0xCD],
-            result: Packet::ManufacturerData(&[0xAB, 0xCD]),
+            result: Ok(Packet::ManufacturerData(&[0xAB, 0xCD])),
         }
 
         test other_1 {
             input: [0x01],
-            result: Packet::Other(0x01, &[]),
+            result: Ok(Packet::Other(0x01, &[])),
         }
 
         test other_2 {
             input: [0x02, 0x03, 0x04],
-            result: Packet::Other(0x02, &[0x03, 0x04]),
+            result: Ok(Packet::Other(0x02, &[0x03, 0x04])),
         }
 
         test other_3 {
             input: [0x01, 0xCD, 0xEF, 0x00],
-            result: Packet::Other(0x01, &[0xCD, 0xEF, 0x00]),
+            result: Ok(Packet::Other(0x01, &[0xCD, 0xEF, 0x00])),
         }
     }
 
