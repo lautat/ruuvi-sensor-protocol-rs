@@ -3,9 +3,9 @@ use serde::de::{Error, Unexpected};
 use crate::{gateway::data::{IterPackets, Packet}, SensorValues};
 
 #[derive(serde::Deserialize, Debug)]
-struct MqttData {
+pub struct MqttData {
     #[serde(deserialize_with = "deserialize_data")]
-    data: SensorValues,
+    pub data: SensorValues,
 }
 
 fn deserialize_data<'de, D: serde::Deserializer<'de>>(
