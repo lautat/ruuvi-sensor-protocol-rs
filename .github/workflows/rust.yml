@@ -3,13 +3,18 @@ name: Rust
 on: [push]
 
 jobs:
-  build:
-
+  build-and-test:
+    strategy:
+      matrix:
+        flags:
+          - ""
+          - "--no-default-features"
+          - "--features=gateway"
+          - "--no-default-features --features=gateway"
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose ${{ matrix.flags }}
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose ${{ matrix.flags }}
