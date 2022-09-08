@@ -52,11 +52,9 @@ See [`SensorValues`] documentation for a description of each value.
 
 This crate also supports parsing MQTT message payloads published by a Ruuvi Gateway.
 Deserialization is implemented with [Serde][3], and requires `gateway` feature to be enabled. See
-[`gateway`] module for documentation, structures, and functions. For a complete description of the
-payload formats, read [Ruuvi Gateway data format documentation][4].
+[`gateway`] module for documentation, structures, and functions.
 
 [3]: https://serde.rs
-[4]: https://docs.ruuvi.com/gw-data-formats
 [`gateway`]: crate::gateway
 */
 
