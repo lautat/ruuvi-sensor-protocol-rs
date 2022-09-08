@@ -19,6 +19,8 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ### `0.6.0` (unreleased)
 - Requires 2021 Edition (Rust `>= 1.56`)
+- Support for parsing Ruuvi Gateway MQTT message payloads
+  - It is disabled by default, but can be enabled with `gateway` feature
 
 ### `0.5.0`
 - Requires Rust `>= 1.48`
