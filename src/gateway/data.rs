@@ -1,17 +1,17 @@
-struct IterPackets<'a> {
+pub struct IterPackets<'a> {
     data: &'a [u8],
     index: usize,
 }
 
 impl<'a> IterPackets<'a> {
-    fn new(data: &'a [u8]) -> Self {
+    pub fn new(data: &'a [u8]) -> Self {
         let index = 0;
         Self { data, index }
     }
 }
 
 impl<'a> Iterator for IterPackets<'a> {
-    type Item = Result<Packet<'a>, InvalidLength>;
+    type Item = Result<Packet<'a>, InvalidPacket>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.data.len() {
@@ -24,7 +24,7 @@ impl<'a> Iterator for IterPackets<'a> {
                 Some(Ok(Packet::from(&self.data[start..end])))
             } else {
                 self.index = self.data.len();
-                Some(Err(InvalidLength))
+                Some(Err(InvalidPacket))
             }
         } else {
             None
@@ -33,7 +33,7 @@ impl<'a> Iterator for IterPackets<'a> {
 }
 
 #[derive(Debug, PartialEq)]
-enum Packet<'a> {
+pub enum Packet<'a> {
     Empty,
     ManufacturerData(&'a [u8]),
     Other(u8, &'a [u8]),
@@ -49,7 +49,8 @@ impl<'a> From<&'a [u8]> for Packet<'a> {
     }
 }
 
-struct InvalidLength;
+#[derive(Debug, PartialEq)]
+pub struct InvalidPacket;
 
 #[cfg(test)]
 mod tests {
@@ -176,7 +177,7 @@ mod tests {
             results: [
                 Some(Ok(Packet::ManufacturerData(&[0xAB, 0xCD]))),
                 Some(Ok(Packet::Empty)),
-                Some(Err(InvalidLength)),
+                Some(Err(InvalidPacket)),
                 None,
             ],
         }
