@@ -40,6 +40,7 @@ fn deserialize_data<'de, D: serde::Deserializer<'de>>(
 
 #[cfg(test)]
 mod tests {
+    use crate::{MacAddress, MeasurementSequenceNumber};
     use super::*;
 
     #[test]
@@ -59,7 +60,10 @@ mod tests {
             \"coords\": \"\"
         }\
         ";
-        let _mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+        let mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+
+        assert_eq!(mqtt_data.data.mac_address(), Some([0xF4, 0x1F, 0x0C, 0x28, 0xCB, 0xD6]));
+        assert_eq!(mqtt_data.data.measurement_sequence_number(), Some(10891));
     }
 
     #[test]
@@ -75,7 +79,10 @@ mod tests {
             \"coords\": \"\"
         }\
         ";
-        let _mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+        let mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+
+        assert_eq!(mqtt_data.data.mac_address(), Some([0xF4, 0x1F, 0x0C, 0x28, 0xCB, 0xD6]));
+        assert_eq!(mqtt_data.data.measurement_sequence_number(), Some(10891));
     }
 
     #[test]
@@ -90,7 +97,10 @@ mod tests {
             \"coords\": \"\"
         }\
         ";
-        let _mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+        let mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+
+        assert_eq!(mqtt_data.data.mac_address(), Some([0xF4, 0x1F, 0x0C, 0x28, 0xCB, 0xD6]));
+        assert_eq!(mqtt_data.data.measurement_sequence_number(), Some(10891));
     }
 
     #[test]
@@ -105,7 +115,10 @@ mod tests {
             \"coords\": \"\"
         }\
         ";
-        let _mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+        let mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+
+        assert_eq!(mqtt_data.data.mac_address(), Some([0xF4, 0x1F, 0x0C, 0x28, 0xCB, 0xD6]));
+        assert_eq!(mqtt_data.data.measurement_sequence_number(), Some(10891));
     }
 
     #[test]
@@ -150,12 +163,15 @@ mod tests {
             \"rssi\": -25,
             \"aoa\": [],
             \"cnt\": \"338\",
-            \"data\": \"1BFF990405166455D5C6DE0008FFF403F0AE760F2A8BF41F0C28CBD6\
-                        1BFF990405158A5B05C6810004004403DCAB767A45BDE375CF374E23\",
+            \"data\": \"1BFF990405158A5B05C6810004004403DCAB767A45BDE375CF374E23\
+                        1BFF990405166455D5C6DE0008FFF403F0AE760F2A8BF41F0C28CBD6\",
             \"coords\": \"\"
         }\
         ";
-        let _mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+        let mqtt_data: MqttData = serde_json::from_str(data).unwrap();
+
+        assert_eq!(mqtt_data.data.mac_address(), Some([0xE3, 0x75, 0xCF, 0x37, 0x4E, 0x23]));
+        assert_eq!(mqtt_data.data.measurement_sequence_number(), Some(17853));
     }
 
     #[test]
