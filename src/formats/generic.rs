@@ -10,7 +10,7 @@ use crate::{
 };
 
 /// Represents a set of values read from sensors on the device
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SensorValues {
     /// humidity in parts per million
     humidity: Option<u32>,

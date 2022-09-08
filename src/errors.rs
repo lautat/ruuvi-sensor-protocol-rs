@@ -4,7 +4,7 @@ use core::fmt::{self, Display};
 use std::error::Error;
 
 /// Errors which can occur during parsing of the manufacturer specific data
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ParseError {
     /// Manufacturer id does not match expected value
     UnknownManufacturerId(u16),

@@ -34,7 +34,7 @@ impl<'a> Iterator for IterPackets<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum Packet<'a> {
     Empty,
     ManufacturerData(u16, &'a [u8]),
@@ -57,7 +57,7 @@ impl<'a> TryFrom<&'a [u8]> for Packet<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct InvalidPacket;
 
 #[cfg(test)]

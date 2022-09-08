@@ -7,7 +7,7 @@ use crate::formats::{
 };
 
 /// Raw sensor values parsed from manufacturer data.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct SensorValues {
     humidity: u16,
     temperature: i16,

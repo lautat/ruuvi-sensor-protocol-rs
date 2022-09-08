@@ -6,7 +6,7 @@ use crate::formats::{
     AccelerationVector,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct SensorValues {
     humidity: u8,
     temperature: u16,

@@ -7,7 +7,7 @@ pub use crate::formats::{
 };
 
 /// a 3-dimensional vector which represents acceleration of each dimension in milli-G
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct AccelerationVector(pub i16, pub i16, pub i16);
 
 mod generic;
