@@ -14,7 +14,7 @@ fn deserialize_data<'de, D: serde::Deserializer<'de>>(
     let data: Vec<u8> = hex::serde::deserialize(deserializer)?;
     let mut packets = IterPackets::new(&data);
     let manufacturer_data = packets.try_fold(None, |result, packet| match (result, packet) {
-        (None, Ok(Packet::ManufacturerData(data))) => Ok(Some(data)),
+        (None, Ok(Packet::ManufacturerData(_, data))) => Ok(Some(data)),
         (_, Err(err)) => Err(err),
         (result, _) => Ok(result),
     });
