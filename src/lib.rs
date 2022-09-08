@@ -3,7 +3,7 @@
 ruuvi-sensor-protocol implements parser for [Ruuvi Sensor Protocols][1] used by the
 [RuuviTag sensor beacon][2].
 
-[1]: https://github.com/ruuvi/ruuvi-sensor-protocols
+[1]: https://docs.ruuvi.com/communication/bluetooth-advertisements
 [2]: https://ruuvi.com
 
 # Parsing a set of values from manufacturer specific data

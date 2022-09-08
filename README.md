@@ -30,7 +30,7 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ### `0.4.0`
 - Requires Rust `>= 1.34`
-- Add support for [data format 5 (RAWv2)](https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_05.md).
+- Add support for [data format 5 (RAWv2)](https://docs.ruuvi.com/communication/bluetooth-advertisements/data-format-5-rawv2).
 
 ### `0.3.0`
 - Requires 2018 Edition (Rust `>= 1.31`)
