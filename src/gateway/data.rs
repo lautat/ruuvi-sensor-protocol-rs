@@ -36,7 +36,6 @@ impl<'a> Iterator for IterPackets<'a> {
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum Packet<'a> {
-    Empty,
     ManufacturerData(u16, &'a [u8]),
     Other(u8, &'a [u8]),
 }
@@ -46,12 +45,11 @@ impl<'a> TryFrom<&'a [u8]> for Packet<'a> {
 
     fn try_from(data: &'a [u8]) -> Result<Self, Self::Error> {
         match data {
-            [] => Ok(Self::Empty),
             [0xFF, id1, id2, data @ ..] => {
                 let id = u16::from_le_bytes([*id1, *id2]);
                 Ok(Self::ManufacturerData(id, data))
             }
-            [0xFF, ..] => Err(InvalidPacket),
+            [] | [0xFF, ..] => Err(InvalidPacket),
             [typ, data @ ..] => Ok(Self::Other(*typ, data)),
         }
     }
@@ -120,7 +118,7 @@ mod tests {
     test_packet_from_slice! {
         test empty_slice {
             input: [],
-            result: Ok(Packet::Empty),
+            result: Err(InvalidPacket),
         }
 
         test manufacturer_data_1 {
@@ -184,7 +182,7 @@ mod tests {
             input: [0x03, 0xFF, 0xAB, 0xCD, 0x00, 0x02, 0x01, 0xFF],
             results: [
                 Some(Ok(Packet::ManufacturerData(0xCDAB, &[]))),
-                Some(Ok(Packet::Empty)),
+                Some(Err(InvalidPacket)),
                 Some(Ok(Packet::Other(0x01, &[0xFF]))),
                 None,
             ],
@@ -194,7 +192,7 @@ mod tests {
             input: [0x03, 0xFF, 0xAB, 0xCD, 0x00, 0x03, 0x01, 0xFF],
             results: [
                 Some(Ok(Packet::ManufacturerData(0xCDAB, &[]))),
-                Some(Ok(Packet::Empty)),
+                Some(Err(InvalidPacket)),
                 Some(Err(InvalidPacket)),
                 None,
             ],
