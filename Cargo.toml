@@ -1,6 +1,6 @@
 [package]
 name = "ruuvi-sensor-protocol"
-version = "0.6.1"
+version = "0.6.2-dev.0"
 authors = ["Atte Lautanala <atte.lautanala@gmail.com>", "Henrik Lievonen <github@hli.fi>"]
 edition = "2021"
 rust-version = "1.60"

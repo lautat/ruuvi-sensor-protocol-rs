@@ -17,6 +17,8 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ## Changes
 
+### `0.6.2` (unreleased)
+
 ### `0.6.1`
 - Build documentation with all features for docs.rs
 
