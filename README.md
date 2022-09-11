@@ -17,6 +17,8 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ## Changes
 
+### `0.6.1` (unreleased)
+
 ### `0.6.0`
 - Requires 2021 Edition (Rust `>= 1.60`)
 - Support for parsing Ruuvi Gateway MQTT message payloads
