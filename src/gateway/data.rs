@@ -2,14 +2,12 @@ use core::convert::TryFrom;
 
 pub struct IterPackets<'a> {
     data: &'a [u8],
-    index: usize,
 }
 
 impl<'a> IterPackets<'a> {
     pub fn new<T: AsRef<[u8]> + ?Sized>(data: &'a T) -> Self {
         let data = data.as_ref();
-        let index = 0;
-        Self { data, index }
+        Self { data }
     }
 }
 
@@ -17,16 +15,16 @@ impl<'a> Iterator for IterPackets<'a> {
     type Item = Result<Packet<'a>, InvalidPacket>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.data.len() {
-            let len = self.data[self.index];
-            let start = self.index + 1;
-            let end = start + usize::from(len);
+        if !self.data.is_empty() {
+            let len = usize::from(self.data[0]);
+            let data = &self.data[1..];
 
-            if end <= self.data.len() {
-                self.index = end;
-                Some(Packet::try_from(&self.data[start..end]))
+            if len <= data.len() {
+                let (packet, remaining) = data.split_at(len);
+                self.data = remaining;
+                Some(Packet::try_from(packet))
             } else {
-                self.index = self.data.len();
+                self.data = &data[data.len()..];
                 Some(Err(InvalidPacket))
             }
         } else {
