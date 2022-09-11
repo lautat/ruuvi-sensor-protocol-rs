@@ -69,8 +69,10 @@ re-exported from [`serde_json`].
 
 */
 pub use crate::gateway::mqtt::MqttData;
+#[cfg(feature = "std")]
+pub use serde_json::from_reader as from_json_reader;
 pub use serde_json::{
-    from_reader as from_json_reader, from_slice as from_json_slice, from_str as from_json_str,
+    from_slice as from_json_slice, from_str as from_json_str,
     Error as JsonError,
 };
 
