@@ -25,37 +25,31 @@ fn deserialize_data<'de, D: serde::Deserializer<'de>>(
     deserializer: D,
 ) -> Result<SensorValues, D::Error> {
     let encoded: Cow<'_, str> = Deserialize::deserialize(deserializer)?;
-    let decoded = hex::decode(encoded.as_ref());
+    let decoded = hex::decode(encoded.as_ref()).map_err(|_| {
+        D::Error::invalid_value(
+            Unexpected::Str(&encoded),
+            &"a hex-encoded Bluetooth advertisement data",
+        )
+    })?;
 
-    if let Ok(decoded) = decoded {
-        let mut packets = IterPackets::new(&decoded);
-        let manufacturer_data = packets.try_fold(None, |result, packet| match (result, packet) {
-            (None, Ok(Packet::ManufacturerData(id, data))) => Ok(Some((id, data))),
-            (_, Err(err)) => Err(err),
-            (result, _) => Ok(result),
-        });
+    let mut packets = IterPackets::new(&decoded);
+    let manufacturer_data = packets.try_fold(None, |result, packet| match (result, packet) {
+        (None, Ok(Packet::ManufacturerData(id, data))) => Ok(Some((id, data))),
+        (_, Err(err)) => Err(err),
+        (result, _) => Ok(result),
+    });
 
-        if let Ok(Some((id, data))) = manufacturer_data {
-            if let Ok(values) = SensorValues::from_manufacturer_specific_data(id, data) {
-                Ok(values)
-            } else {
-                let error = D::Error::invalid_value(
-                    Unexpected::Str(&encoded),
-                    &"an advertisement containing a valid Ruuvi manufacturer data packet",
-                );
-                Err(error)
-            }
-        } else {
-            let error = D::Error::invalid_value(
+    if let Ok(Some((id, data))) = manufacturer_data {
+        SensorValues::from_manufacturer_specific_data(id, data).map_err(|_| {
+            D::Error::invalid_value(
                 Unexpected::Str(&encoded),
-                &"a valid advertisement containing a manufacturer data packet",
-            );
-            Err(error)
-        }
+                &"an advertisement containing a valid Ruuvi manufacturer data packet",
+            )
+        })
     } else {
         let error = D::Error::invalid_value(
             Unexpected::Str(&encoded),
-            &"a hex-encoded Bluetooth advertisement data",
+            &"a valid advertisement containing a manufacturer data packet",
         );
         Err(error)
     }
