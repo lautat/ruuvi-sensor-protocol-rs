@@ -23,7 +23,7 @@ std = []
 
 [dependencies.hex]
 default-features = false
-features = ["serde", "std"]
+features = ["std"]
 optional = true
 version = "0.4.3"
 
