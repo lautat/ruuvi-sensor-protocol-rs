@@ -6,7 +6,8 @@ pub struct IterPackets<'a> {
 }
 
 impl<'a> IterPackets<'a> {
-    pub fn new(data: &'a [u8]) -> Self {
+    pub fn new<T: AsRef<[u8]> + ?Sized>(data: &'a T) -> Self {
+        let data = data.as_ref();
         let index = 0;
         Self { data, index }
     }
