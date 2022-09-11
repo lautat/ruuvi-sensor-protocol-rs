@@ -1,6 +1,6 @@
 [package]
 name = "ruuvi-sensor-protocol"
-version = "0.6.1-dev.0"
+version = "0.6.1"
 authors = ["Atte Lautanala <atte.lautanala@gmail.com>", "Henrik Lievonen <github@hli.fi>"]
 edition = "2021"
 rust-version = "1.60"
@@ -10,6 +10,9 @@ readme = "README.md"
 keywords = ["ruuvi", "ruuvitag"]
 categories = ["parser-implementations", "no-std"]
 license = "MIT"
+
+[package.metadata.docs.rs]
+all-features = true
 
 [badges.maintenance]
 status = "passively-maintained"
