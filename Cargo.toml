@@ -16,7 +16,7 @@ status = "passively-maintained"
 
 [features]
 default = ["std"]
-gateway = ["hex", "serde", "serde_json", "std"]
+gateway = ["hex", "serde", "serde_json"]
 std = ["serde_json?/std"]
 
 [dependencies]

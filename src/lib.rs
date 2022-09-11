@@ -61,6 +61,9 @@ Deserialization is implemented with [Serde][3], and requires `gateway` feature t
 #![warn(rust_2018_idioms)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[cfg(feature = "gateway")]
+extern crate alloc;
+
 pub use crate::{
     errors::ParseError,
     formats::{

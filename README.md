@@ -8,7 +8,7 @@ Ruuvi sensor protocol parser implementation
 
 ## Crate Features
 - `std` (default) enables features that depend on `std` crate
-- `gateway` adds parsers for Ruuvi Gateway payload formats, enables `std` and adds `hex`, `serde` and `serde_json` dependencies
+- `gateway` adds parsers for Ruuvi Gateway payload formats, adds `hex`, `serde` and `serde_json` dependencies and requires `alloc` crate from the standard library
 
 ## Documentation
 Docs are available online at
