@@ -17,24 +17,24 @@ status = "passively-maintained"
 [features]
 default = ["std"]
 gateway = ["hex", "serde", "serde_json", "std"]
-std = []
+std = ["serde_json?/std"]
 
 [dependencies]
 
 [dependencies.hex]
 default-features = false
-features = ["std"]
+features = ["alloc"]
 optional = true
 version = "0.4.3"
 
 [dependencies.serde]
 default-features = false
-features = ["std", "derive"]
+features = ["alloc", "derive"]
 optional = true
 version = "1.0.144"
 
 [dependencies.serde_json]
 default-features = false
-features = ["std"]
+features = ["alloc"]
 optional = true
 version = "1.0.85"
