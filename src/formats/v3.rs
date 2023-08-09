@@ -85,6 +85,7 @@ impl ProtocolPayload for SensorValues {
 }
 
 impl From<&[u8; Self::SIZE]> for SensorValues {
+    #[allow(clippy::similar_names)]
     fn from(value: &[u8; Self::SIZE]) -> Self {
         let [humidity, temperature_1, temperature_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, potential_1, potential_2] =
             value;

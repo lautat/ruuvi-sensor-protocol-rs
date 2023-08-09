@@ -46,6 +46,7 @@ pub trait Temperature {
     fn temperature_as_millicelsius(&self) -> Option<i32> {
         let temperature = self.temperature_as_millikelvins()?;
 
+        #[allow(clippy::cast_possible_wrap)]
         Some(temperature as i32 - Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32)
     }
 }

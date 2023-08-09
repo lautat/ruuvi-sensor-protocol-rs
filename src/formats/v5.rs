@@ -101,7 +101,10 @@ impl Temperature for SensorValues {
             None
         } else {
             let temperature = i32::from(self.temperature) * 5;
+
+            #[allow(clippy::cast_possible_wrap, clippy::cast_sign_loss)]
             let temperature = (Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32 + temperature) as u32;
+
             Some(temperature)
         }
     }
@@ -125,6 +128,7 @@ impl ProtocolPayload for SensorValues {
 }
 
 impl From<&[u8; Self::SIZE]> for SensorValues {
+    #[allow(clippy::similar_names)]
     fn from(value: &[u8; Self::SIZE]) -> Self {
         let [temperature_1, temperature_2, humidity_1, humidity_2, pressure_1, pressure_2, acceleration_x_1, acceleration_x_2, acceleration_y_1, acceleration_y_2, acceleration_z_1, acceleration_z_2, power_1, power_2, movement_counter, measurement_sequence_number_1, measurement_sequence_number_2, mac_1, mac_2, mac_3, mac_4, mac_5, mac_6] =
             value;
