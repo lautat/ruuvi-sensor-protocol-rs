@@ -44,8 +44,9 @@ pub trait Temperature {
 
     /// Returns temperature as milli-Celsius if a temperature reading is available.
     fn temperature_as_millicelsius(&self) -> Option<i32> {
-        self.temperature_as_millikelvins()
-            .map(|temperature| temperature as i32 - Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32)
+        let temperature = self.temperature_as_millikelvins()?;
+
+        Some(temperature as i32 - Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32)
     }
 }
 
