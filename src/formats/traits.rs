@@ -126,8 +126,8 @@ mod tests {
         }
 
         test above_zero_celsius_1 {
-            millikelvins: Some(4343_934),
-            millicelsius: Some(4070_784),
+            millikelvins: Some(4_343_934),
+            millicelsius: Some(4_070_784),
         }
 
         test above_zero_celsius_2 {
