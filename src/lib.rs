@@ -59,13 +59,22 @@ Deserialization is implemented with [Serde][3], and requires `gateway` feature t
 */
 
 #![warn(
+    clippy::alloc_instead_of_core,
     clippy::as_conversions,
     clippy::assertions_on_result_states,
     clippy::cargo,
+    clippy::dbg_macro,
     clippy::decimal_literal_representation,
+    clippy::expect_used,
+    clippy::panic,
     clippy::pedantic,
     clippy::self_named_module_files,
+    clippy::std_instead_of_alloc,
+    clippy::std_instead_of_core,
+    clippy::todo,
+    clippy::unimplemented,
     clippy::unwrap_used,
+    clippy::unreachable,
     rust_2018_idioms
 )]
 #![cfg_attr(not(feature = "std"), no_std)]
