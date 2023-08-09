@@ -58,7 +58,7 @@ Deserialization is implemented with [Serde][3], and requires `gateway` feature t
 [`gateway`]: crate::gateway
 */
 
-#![warn(rust_2018_idioms, clippy::cargo, clippy::pedantic)]
+#![warn(rust_2018_idioms, clippy::cargo, clippy::pedantic, clippy::unwrap_used)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(feature = "gateway")]

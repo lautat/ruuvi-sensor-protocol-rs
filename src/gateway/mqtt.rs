@@ -56,6 +56,7 @@ fn deserialize_data<'de, D: serde::Deserializer<'de>>(
     }
 }
 
+#[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod tests {
     use super::*;
