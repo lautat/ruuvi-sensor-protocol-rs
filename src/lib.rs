@@ -59,6 +59,7 @@ Deserialization is implemented with [Serde][3], and requires `gateway` feature t
 */
 
 #![warn(
+    clippy::as_conversions,
     clippy::cargo,
     clippy::pedantic,
     clippy::self_named_module_files,
