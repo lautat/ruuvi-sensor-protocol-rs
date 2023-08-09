@@ -35,10 +35,13 @@ pub struct SensorValues {
 const MANUFACTURER_DATA_ID: u16 = 0x0499;
 
 impl SensorValues {
-    /// Parses sensor values from the payload encoded in manufacturer specific data -field. The
-    /// function returns a `ParseError` if the `id` does not match the exptected `id` in the
-    /// manufacturer specific data, or the format of the `value` is not supported. At the moment
-    /// only versions 3 and 5 of the format are supported.
+    /// Parses sensor values from the payload encoded in manufacturer specific data -field. At the
+    /// moment only versions 3 and 5 of the format are supported.
+    ///
+    /// # Errors
+    ///
+    /// The function returns a `ParseError` if the `id` does not match the exptected `id` in the
+    /// manufacturer specific data, or the format of the `value` is not supported.
     ///
     /// # Examples
     ///
