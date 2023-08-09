@@ -166,7 +166,7 @@ mod tests {
         ";
         let mqtt_data: Result<MqttData, _> = serde_json::from_str(data);
 
-        assert!(mqtt_data.is_err());
+        mqtt_data.unwrap_err();
     }
 
     #[test]
@@ -183,7 +183,7 @@ mod tests {
         ";
         let mqtt_data: Result<MqttData, _> = serde_json::from_str(data);
 
-        assert!(mqtt_data.is_err());
+        mqtt_data.unwrap_err();
     }
 
     #[test]
@@ -222,7 +222,7 @@ mod tests {
         ";
         let mqtt_data: Result<MqttData, _> = serde_json::from_str(data);
 
-        assert!(mqtt_data.is_err());
+        mqtt_data.unwrap_err();
     }
 
     #[test]
@@ -239,6 +239,6 @@ mod tests {
         ";
         let mqtt_data: Result<MqttData, _> = serde_json::from_str(data);
 
-        assert!(mqtt_data.is_err());
+        mqtt_data.unwrap_err();
     }
 }
