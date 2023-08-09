@@ -15,7 +15,9 @@ impl<'a> Iterator for IterPackets<'a> {
     type Item = Result<Packet<'a>, InvalidPacket>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if !self.data.is_empty() {
+        if self.data.is_empty() {
+            None
+        } else {
             let len = usize::from(self.data[0]);
             let data = &self.data[1..];
 
@@ -27,8 +29,6 @@ impl<'a> Iterator for IterPackets<'a> {
                 self.data = &data[data.len()..];
                 Some(Err(InvalidPacket))
             }
-        } else {
-            None
         }
     }
 }

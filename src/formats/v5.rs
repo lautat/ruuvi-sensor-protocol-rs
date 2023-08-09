@@ -21,14 +21,14 @@ pub struct SensorValues {
 
 impl Acceleration for SensorValues {
     fn acceleration_vector_as_milli_g(&self) -> Option<AccelerationVector> {
-        if self.acceleration.iter().all(|acc| *acc != i16::min_value()) {
+        if self.acceleration.iter().any(|acc| *acc == i16::min_value()) {
+            None
+        } else {
             Some(AccelerationVector(
                 self.acceleration[0],
                 self.acceleration[1],
                 self.acceleration[2],
             ))
-        } else {
-            None
         }
     }
 }
@@ -36,72 +36,73 @@ impl Acceleration for SensorValues {
 impl BatteryPotential for SensorValues {
     fn battery_potential_as_millivolts(&self) -> Option<u16> {
         let raw_value = self.power_info >> 5;
-        if raw_value != 2047 {
-            Some(1_600 + raw_value)
-        } else {
+
+        if raw_value == 2047 {
             None
+        } else {
+            Some(1_600 + raw_value)
         }
     }
 }
 
 impl Humidity for SensorValues {
     fn humidity_as_ppm(&self) -> Option<u32> {
-        if self.humidity != 0xFFFF {
-            Some(u32::from(self.humidity) * 25)
-        } else {
+        if self.humidity == 0xFFFF {
             None
+        } else {
+            Some(u32::from(self.humidity) * 25)
         }
     }
 }
 
 impl MacAddress for SensorValues {
     fn mac_address(&self) -> Option<[u8; 6]> {
-        if self.mac_address != [0xFF; 6] {
-            Some(self.mac_address)
-        } else {
+        if self.mac_address == [0xFF; 6] {
             None
+        } else {
+            Some(self.mac_address)
         }
     }
 }
 
 impl MeasurementSequenceNumber for SensorValues {
     fn measurement_sequence_number(&self) -> Option<u32> {
-        if self.measurement_sequence_number != 0xFFFF {
-            Some(u32::from(self.measurement_sequence_number))
-        } else {
+        if self.measurement_sequence_number == 0xFFFF {
             None
+        } else {
+            Some(u32::from(self.measurement_sequence_number))
         }
     }
 }
 
 impl MovementCounter for SensorValues {
     fn movement_counter(&self) -> Option<u32> {
-        if self.movement_counter != 0xFF {
-            Some(u32::from(self.movement_counter))
-        } else {
+        if self.movement_counter == 0xFF {
             None
+        } else {
+            Some(u32::from(self.movement_counter))
         }
     }
 }
 
 impl Pressure for SensorValues {
     fn pressure_as_pascals(&self) -> Option<u32> {
-        if self.pressure != 0xFFFF {
-            Some(u32::from(self.pressure) + 50_000)
-        } else {
+        if self.pressure == 0xFFFF {
             None
+        } else {
+            Some(u32::from(self.pressure) + 50_000)
         }
     }
 }
 
 impl Temperature for SensorValues {
     fn temperature_as_millikelvins(&self) -> Option<u32> {
-        if self.temperature != i16::min_value() {
+        if self.temperature == i16::min_value() {
+            None
+        } else {
             let temperature = i32::from(self.temperature) * 5;
             let temperature = (Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32 + temperature) as u32;
             Some(temperature)
-        } else {
-            None
         }
     }
 }
@@ -109,10 +110,11 @@ impl Temperature for SensorValues {
 impl TransmitterPower for SensorValues {
     fn tx_power_as_dbm(&self) -> Option<i8> {
         let raw_value = (self.power_info & 0x1F) as i8;
-        if raw_value != 31 {
-            Some(raw_value * 2 - 40)
-        } else {
+
+        if raw_value == 31 {
             None
+        } else {
+            Some(raw_value * 2 - 40)
         }
     }
 }
