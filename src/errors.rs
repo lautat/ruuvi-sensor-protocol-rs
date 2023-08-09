@@ -21,18 +21,15 @@ impl Display for ParseError {
         match self {
             ParseError::UnknownManufacturerId(id) => write!(
                 formatter,
-                "Unknown manufacturer id {:#04X}, only 0x0499 is supported",
-                id
+                "Unknown manufacturer id {id:#04X}, only 0x0499 is supported"
             ),
             ParseError::UnsupportedFormatVersion(format_version) => write!(
                 formatter,
-                "Unsupported data format version {}, only version 3 is supported",
-                format_version
+                "Unsupported data format version {format_version}, only version 3 is supported"
             ),
             ParseError::InvalidValueLength(version, length, expected) => write!(
                 formatter,
-                "Invalid data length of {} for format version {}, expected {}",
-                length, version, expected
+                "Invalid data length of {length} for format version {version}, expected {expected}"
             ),
             ParseError::EmptyValue => write!(formatter, "Empty value, expected at least one byte"),
         }
