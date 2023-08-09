@@ -229,7 +229,7 @@ mod tests {
         test min_values {
             values: SensorValues::from(&MIN_VALUES),
             expected: {
-                acceleration_vector_as_milli_g: Some(AccelerationVector(-32_767, -32_767, -32_767)),
+                acceleration_vector_as_milli_g: Some(AccelerationVector(-0x7FFF, -0x7FFF, -0x7FFF)),
                 battery_potential_as_millivolts: Some(1_600),
                 humidity_as_ppm: Some(0),
                 measurement_sequence_number: Some(0),
@@ -243,10 +243,10 @@ mod tests {
         test max_values {
             values: SensorValues::from(&MAX_VALUES),
             expected: {
-                acceleration_vector_as_milli_g: Some(AccelerationVector(32_767, 32_767, 32_767)),
+                acceleration_vector_as_milli_g: Some(AccelerationVector(0x7FFF, 0x7FFF, 0x7FFF)),
                 battery_potential_as_millivolts: Some(3_646),
                 humidity_as_ppm: Some(1_638_350),
-                measurement_sequence_number: Some(65_534),
+                measurement_sequence_number: Some(0xFFFE),
                 movement_counter: Some(254),
                 pressure_as_pascals: Some(115_534),
                 temperature_as_millicelsius: Some(163_835),
