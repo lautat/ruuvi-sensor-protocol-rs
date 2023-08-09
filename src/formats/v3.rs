@@ -126,7 +126,7 @@ mod tests {
                 acceleration: AccelerationVector(1000, 1255, 1510),
                 battery_potential: 0x0886
             }
-        )
+        );
     }
 
     test_measurement_trait_methods! {
