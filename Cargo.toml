@@ -41,3 +41,24 @@ default-features = false
 features = ["alloc"]
 optional = true
 version = "1.0.85"
+
+[lints.clippy]
+alloc-instead-of-core = "warn"
+as-conversions = "warn"
+assertions-on-result-states = "warn"
+cargo = "warn"
+dbg-macro = "warn"
+decimal-literal-representation = "warn"
+expect-used = "warn"
+panic = "warn"
+pedantic = "warn"
+self-named-module-files = "warn"
+std-instead-of-alloc = "warn"
+std-instead-of-core = "warn"
+todo = "warn"
+unimplemented = "warn"
+unwrap-used = "warn"
+unreachable = "warn"
+
+[lints.rust]
+rust-2018-idioms = "warn"
