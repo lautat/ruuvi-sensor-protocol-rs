@@ -102,7 +102,11 @@ impl Temperature for SensorValues {
         } else {
             let temperature = i32::from(self.temperature) * 5;
 
-            #[allow(clippy::as_conversions, clippy::cast_possible_wrap, clippy::cast_sign_loss)]
+            #[allow(
+                clippy::as_conversions,
+                clippy::cast_possible_wrap,
+                clippy::cast_sign_loss
+            )]
             let temperature = (Self::ZERO_CELSIUS_IN_MILLIKELVINS as i32 + temperature) as u32;
 
             Some(temperature)
