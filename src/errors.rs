@@ -3,6 +3,7 @@ use core::fmt::{self, Display};
 use core::error::Error;
 
 /// Errors which can occur during parsing of the manufacturer specific data
+#[non_exhaustive]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ParseError {
     /// Manufacturer id does not match expected value

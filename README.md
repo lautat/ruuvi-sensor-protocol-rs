@@ -20,6 +20,7 @@ from source with `cargo doc`. Examples are included in the docs.
 ### `0.7.0` (unreleased)
 - Requires Rust `>= 1.81`
 - Uses `core::error::Error` trait, which enables the trait when built without `std`
+- `ParseError` is now non-exhaustive
 
 ### `0.6.1`
 - Build documentation with all features for docs.rs
