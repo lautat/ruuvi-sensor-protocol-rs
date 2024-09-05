@@ -14,7 +14,7 @@ use crate::{
 ///
 /// At the moment, only the `data` field is parsed from the payload although it may contain other
 /// fields.
-#[allow(clippy::module_name_repetitions)]
+#[expect(clippy::module_name_repetitions)]
 #[derive(serde::Deserialize, Debug)]
 pub struct MqttData {
     /// RuuviTag sensor values parsed from the message payload
@@ -56,7 +56,7 @@ fn deserialize_data<'de, D: serde::Deserializer<'de>>(
     }
 }
 
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 #[cfg(test)]
 mod tests {
     use super::*;
