@@ -1,7 +1,6 @@
 use core::fmt::{self, Display};
 
-#[cfg(feature = "std")]
-use std::error::Error;
+use core::error::Error;
 
 /// Errors which can occur during parsing of the manufacturer specific data
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -36,7 +35,6 @@ impl Display for ParseError {
     }
 }
 
-#[cfg(feature = "std")]
 impl Error for ParseError {}
 
 #[cfg(test)]
