@@ -21,7 +21,7 @@ pub struct SensorValues {
 
 impl Acceleration for SensorValues {
     fn acceleration_vector_as_milli_g(&self) -> Option<AccelerationVector> {
-        if self.acceleration.iter().any(|acc| *acc == i16::min_value()) {
+        if self.acceleration.iter().any(|acc| *acc == i16::MIN) {
             None
         } else {
             Some(AccelerationVector(
@@ -97,7 +97,7 @@ impl Pressure for SensorValues {
 
 impl Temperature for SensorValues {
     fn temperature_as_millikelvins(&self) -> Option<u32> {
-        if self.temperature == i16::min_value() {
+        if self.temperature == i16::MIN {
             None
         } else {
             let temperature = i32::from(self.temperature) * 5;
