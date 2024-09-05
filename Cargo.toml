@@ -1,9 +1,9 @@
 [package]
 name = "ruuvi-sensor-protocol"
-version = "0.6.2-dev.0"
+version = "0.7.0-dev.0"
 authors = ["Atte Lautanala <atte@lautana.la>", "Henrik Lievonen <github@hli.fi>"]
 edition = "2021"
-rust-version = "1.60"
+rust-version = "1.81"
 description = "Ruuvi sensor protocol parser implementation"
 repository = "https://github.com/lautat/ruuvi-sensor-protocol-rs"
 readme = "README.md"
