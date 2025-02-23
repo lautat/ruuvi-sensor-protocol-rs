@@ -1,13 +1,13 @@
 use alloc::borrow::Cow;
 
 use serde::{
-    de::{Error, Unexpected},
     Deserialize,
+    de::{Error, Unexpected},
 };
 
 use crate::{
-    gateway::data::{IterPackets, Packet},
     SensorValues,
+    gateway::data::{IterPackets, Packet},
 };
 
 /// MQTT Message payload sent by Ruuvi Gateway

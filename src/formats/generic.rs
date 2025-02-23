@@ -1,11 +1,12 @@
 use crate::{
     errors::ParseError,
     formats::{
+        AccelerationVector,
         traits::{
             Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
             MovementCounter, Pressure, ProtocolPayload, Temperature, TransmitterPower,
         },
-        v3, v5, AccelerationVector,
+        v3, v5,
     },
 };
 
