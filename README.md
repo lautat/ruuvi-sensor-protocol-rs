@@ -3,7 +3,7 @@
 Ruuvi sensor protocol parser implementation
 
 ## Requirements
-- Rust `>= 1.81`
+- Rust `>= 1.85`
   - This crate can be compiled without `std` by disabling default features
 
 ## Crate Features
@@ -18,7 +18,7 @@ from source with `cargo doc`. Examples are included in the docs.
 ## Changes
 
 ### `0.7.0` (unreleased)
-- Requires Rust `>= 1.81`
+- Requires 2024 Edition (Rust `>= 1.85`)
 - Uses `core::error::Error` trait, which enables the trait when built without `std`
 - `ParseError` is now non-exhaustive
 
