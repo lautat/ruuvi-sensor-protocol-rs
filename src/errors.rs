@@ -25,7 +25,7 @@ impl Display for ParseError {
             ),
             ParseError::UnsupportedFormatVersion(format_version) => write!(
                 formatter,
-                "Unsupported data format version {format_version}, only version 3 is supported"
+                "Unsupported data format version {format_version}, only versions 3, 5, 6 and E1 are supported"
             ),
             ParseError::InvalidValueLength(version, length, expected) => write!(
                 formatter,
