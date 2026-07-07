@@ -56,16 +56,71 @@ pub trait TransmitterPower {
     fn tx_power_as_dbm(&self) -> Option<i8>;
 }
 
+pub trait ParticulateMatter {
+    /// Returns PM1.0 mass concentration as nanograms per cubic meter (ng/m³)
+    fn pm1_0_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+
+    /// Returns PM2.5 mass concentration as nanograms per cubic meter (ng/m³)
+    fn pm2_5_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+
+    /// Returns PM4.0 mass concentration as nanograms per cubic meter (ng/m³)
+    fn pm4_0_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+
+    /// Returns PM10.0 mass concentration as nanograms per cubic meter (ng/m³)
+    fn pm10_0_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+}
+
+pub trait CarbonDioxide {
+    /// Returns carbon dioxide concentration as parts per million (ppm)
+    fn carbon_dioxide_as_ppm(&self) -> Option<u16> {
+        None
+    }
+}
+
+pub trait VolatileOrganicCompounds {
+    /// Returns volatile organic compound index
+    fn voc_index(&self) -> Option<u16> {
+        None
+    }
+}
+
+pub trait NitrogenOxides {
+    /// Returns nitrogen oxide index
+    fn nox_index(&self) -> Option<u16> {
+        None
+    }
+}
+
+pub trait Luminosity {
+    /// Returns luminosity as millilux
+    fn luminosity_as_millilux(&self) -> Option<u32> {
+        None
+    }
+}
+
 pub trait ProtocolPayload:
     Acceleration
     + BatteryPotential
+    + CarbonDioxide
     + Humidity
+    + Luminosity
     + MacAddress
     + MeasurementSequenceNumber
     + MovementCounter
+    + NitrogenOxides
+    + ParticulateMatter
     + Pressure
     + Temperature
     + TransmitterPower
+    + VolatileOrganicCompounds
 {
     const VERSION: u8;
     const SIZE: usize;

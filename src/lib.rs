@@ -66,9 +66,9 @@ extern crate alloc;
 pub use crate::{
     errors::ParseError,
     formats::{
-        Acceleration, AccelerationVector, BatteryPotential, Humidity, MacAddress,
-        MeasurementSequenceNumber, MovementCounter, Pressure, SensorValues, Temperature,
-        TransmitterPower,
+        Acceleration, AccelerationVector, BatteryPotential, CarbonDioxide, Humidity, Luminosity,
+        MacAddress, MeasurementSequenceNumber, MovementCounter, NitrogenOxides, ParticulateMatter,
+        Pressure, SensorValues, Temperature, TransmitterPower, VolatileOrganicCompounds,
     },
 };
 
