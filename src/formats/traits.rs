@@ -99,6 +99,16 @@ pub trait NitrogenOxides {
     }
 }
 
+pub trait Calibration {
+    /// Returns calibration status if available.
+    ///
+    /// `Some(true)` indicates calibration is in progress and sensor data may not be fully accurate.
+    /// `Some(false)` indicates calibration is complete.
+    fn calibration_in_progress(&self) -> Option<bool> {
+        None
+    }
+}
+
 pub trait Luminosity {
     /// Returns luminosity as millilux
     fn luminosity_as_millilux(&self) -> Option<u32> {
@@ -109,6 +119,7 @@ pub trait Luminosity {
 pub trait ProtocolPayload:
     Acceleration
     + BatteryPotential
+    + Calibration
     + CarbonDioxide
     + Humidity
     + Luminosity

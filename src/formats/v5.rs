@@ -1,9 +1,9 @@
 use crate::formats::{
     AccelerationVector,
     traits::{
-        Acceleration, BatteryPotential, CarbonDioxide, Humidity, Luminosity, MacAddress,
-        MeasurementSequenceNumber, MovementCounter, NitrogenOxides, ParticulateMatter, Pressure,
-        ProtocolPayload, Temperature, TransmitterPower, VolatileOrganicCompounds,
+        Acceleration, BatteryPotential, Calibration, CarbonDioxide, Humidity, Luminosity,
+        MacAddress, MeasurementSequenceNumber, MovementCounter, NitrogenOxides, ParticulateMatter,
+        Pressure, ProtocolPayload, Temperature, TransmitterPower, VolatileOrganicCompounds,
     },
 };
 
@@ -128,6 +128,7 @@ impl TransmitterPower for SensorValues {
     }
 }
 
+impl Calibration for SensorValues {}
 impl CarbonDioxide for SensorValues {}
 impl Luminosity for SensorValues {}
 impl NitrogenOxides for SensorValues {}
