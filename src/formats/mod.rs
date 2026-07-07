@@ -10,6 +10,7 @@ pub use crate::formats::{
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct AccelerationVector(pub i16, pub i16, pub i16);
 
+mod e1;
 mod generic;
 mod traits;
 mod v3;

@@ -5,7 +5,7 @@ use crate::{
             Acceleration, BatteryPotential, Humidity, MacAddress, MeasurementSequenceNumber,
             MovementCounter, Pressure, ProtocolPayload, Temperature, TransmitterPower,
         },
-        v3, v5, AccelerationVector,
+        e1, v3, v5, AccelerationVector,
     },
 };
 
@@ -36,7 +36,7 @@ const MANUFACTURER_DATA_ID: u16 = 0x0499;
 
 impl SensorValues {
     /// Parses sensor values from the payload encoded in manufacturer specific data -field. At the
-    /// moment only versions 3 and 5 of the format are supported.
+    /// moment versions 3, 5 and E1 of the format are supported.
     ///
     /// # Errors
     ///
@@ -67,6 +67,12 @@ impl SensorValues {
             }
             (MANUFACTURER_DATA_ID, [v5::SensorValues::VERSION, data @ ..]) => {
                 Self::parse_format_version::<v5::SensorValues, { v5::SensorValues::SIZE }>(data)
+            }
+            (MANUFACTURER_DATA_ID, [v6::SensorValues::VERSION, data @ ..]) => {
+                Self::parse_format_version::<v6::SensorValues, { v6::SensorValues::SIZE }>(data)
+            }
+            (MANUFACTURER_DATA_ID, [e1::SensorValues::VERSION, data @ ..]) => {
+                Self::parse_format_version::<e1::SensorValues, { e1::SensorValues::SIZE }>(data)
             }
             (MANUFACTURER_DATA_ID, [version, ..]) => {
                 Err(ParseError::UnsupportedFormatVersion(*version))
@@ -267,6 +273,26 @@ mod tests {
     }
 
     test_format_versions! {
+        version e1 {
+            input: &[
+                0xE1, 0x17, 0x0C, 0x56, 0x68, 0xC7, 0x9E, 0x00, 0x65, 0x00, 0x70, 0x04, 0xBD,
+                0x11, 0xCA, 0x00, 0xC9, 0x0A, 0x02, 0x13, 0xE0, 0xAC, 0x00, 0x00, 0x00, 0xDE,
+                0xCD, 0xEE, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB, 0xB8, 0x33, 0x4C, 0x88,
+                0x4F,
+            ],
+            result: SensorValues {
+                acceleration: None,
+                battery_potential: None,
+                humidity: Some(553_000),
+                mac_address: Some([0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F]),
+                measurement_sequence_number: Some(14_601_710),
+                movement_counter: None,
+                pressure: Some(101_102),
+                temperature: Some(29_500 + 273_150),
+                tx_power: None,
+            },
+        }
+
         version v3 {
             input: &[
                 0x03, 0x17, 0x01, 0x45, 0x35, 0x58, 0x03, 0xE8, 0x04, 0xE7, 0x05, 0xE6, 0x08,
