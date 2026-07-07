@@ -21,7 +21,7 @@ pub struct SensorValues {
 
 impl Acceleration for SensorValues {
     fn acceleration_vector_as_milli_g(&self) -> Option<AccelerationVector> {
-        if self.acceleration.iter().any(|acc| *acc == i16::MIN) {
+        if self.acceleration.contains(&i16::MIN) {
             None
         } else {
             Some(AccelerationVector(
