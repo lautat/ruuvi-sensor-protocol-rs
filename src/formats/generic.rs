@@ -2,9 +2,10 @@ use crate::{
     errors::ParseError,
     formats::{
         traits::{
-            Acceleration, BatteryPotential, CarbonDioxide, Humidity, Luminosity, MacAddress,
-            MeasurementSequenceNumber, MovementCounter, NitrogenOxides, ParticulateMatter,
-            Pressure, ProtocolPayload, Temperature, TransmitterPower, VolatileOrganicCompounds,
+            Acceleration, BatteryPotential, Calibration, CarbonDioxide, Humidity, Luminosity,
+            MacAddress, MeasurementSequenceNumber, MovementCounter, NitrogenOxides,
+            ParticulateMatter, Pressure, ProtocolPayload, Temperature, TransmitterPower,
+            VolatileOrganicCompounds,
         },
         e1, v3, v5, v6, AccelerationVector,
     },
@@ -41,6 +42,8 @@ pub struct SensorValues {
     pm10_0: Option<u32>,
     /// carbon dioxide concentration in parts per million
     carbon_dioxide: Option<u16>,
+    /// calibration in progress
+    calibration_in_progress: Option<bool>,
     /// volatile organic compound index
     voc_index: Option<u16>,
     /// nitrogen oxide index
@@ -104,6 +107,7 @@ impl SensorValues {
             acceleration: values.acceleration_vector_as_milli_g(),
             battery_potential: values.battery_potential_as_millivolts(),
             carbon_dioxide: values.carbon_dioxide_as_ppm(),
+            calibration_in_progress: values.calibration_in_progress(),
             humidity: values.humidity_as_ppm(),
             luminosity: values.luminosity_as_millilux(),
             mac_address: values.mac_address(),
@@ -218,6 +222,12 @@ impl CarbonDioxide for SensorValues {
     }
 }
 
+impl Calibration for SensorValues {
+    fn calibration_in_progress(&self) -> Option<bool> {
+        self.calibration_in_progress
+    }
+}
+
 impl VolatileOrganicCompounds for SensorValues {
     fn voc_index(&self) -> Option<u16> {
         self.voc_index
@@ -307,6 +317,7 @@ mod tests {
                             expected: {
                                 acceleration_vector_as_milli_g: RESULT.acceleration,
                                 battery_potential_as_millivolts: RESULT.battery_potential,
+                                calibration_in_progress: RESULT.calibration_in_progress,
                                 humidity_as_ppm: RESULT.humidity,
                                 mac_address: RESULT.mac_address,
                                 measurement_sequence_number: RESULT.measurement_sequence_number,
@@ -348,6 +359,7 @@ mod tests {
             result: SensorValues {
                 acceleration: None,
                 battery_potential: None,
+                calibration_in_progress: Some(false),
                 carbon_dioxide: Some(201),
                 humidity: Some(553_000),
                 luminosity: Some(13_026_669),
@@ -376,6 +388,7 @@ mod tests {
             result: SensorValues {
                 acceleration: None,
                 battery_potential: None,
+                calibration_in_progress: Some(true),
                 carbon_dioxide: Some(201),
                 humidity: Some(553_000),
                 luminosity: Some(13_027_000),
@@ -402,6 +415,7 @@ mod tests {
             result: SensorValues {
                 acceleration: Some(AccelerationVector(1000, 1255, 1510)),
                 battery_potential: Some(2182),
+                calibration_in_progress: None,
                 carbon_dioxide: None,
                 humidity: Some(115_000),
                 luminosity: None,
@@ -428,6 +442,7 @@ mod tests {
             result: SensorValues {
                 acceleration: Some(AccelerationVector(4, -4, 1036)),
                 battery_potential: Some(2977),
+                calibration_in_progress: None,
                 carbon_dioxide: None,
                 humidity: Some(534_900),
                 luminosity: None,

@@ -1,8 +1,8 @@
 use crate::formats::{
     traits::{
-        Acceleration, BatteryPotential, CarbonDioxide, Humidity, Luminosity, MacAddress,
-        MeasurementSequenceNumber, MovementCounter, NitrogenOxides, ParticulateMatter, Pressure,
-        ProtocolPayload, Temperature, TransmitterPower, VolatileOrganicCompounds,
+        Acceleration, BatteryPotential, Calibration, CarbonDioxide, Humidity, Luminosity,
+        MacAddress, MeasurementSequenceNumber, MovementCounter, NitrogenOxides, ParticulateMatter,
+        Pressure, ProtocolPayload, Temperature, TransmitterPower, VolatileOrganicCompounds,
     },
     AccelerationVector,
 };
@@ -176,6 +176,12 @@ impl NitrogenOxides for SensorValues {
     }
 }
 
+impl Calibration for SensorValues {
+    fn calibration_in_progress(&self) -> Option<bool> {
+        Some(self.flags & 0x01 != 0)
+    }
+}
+
 impl Luminosity for SensorValues {
     fn luminosity_as_millilux(&self) -> Option<u32> {
         if self.luminosity_code == 0xFF {
@@ -201,6 +207,7 @@ impl From<&[u8; Self::SIZE]> for SensorValues {
         let voc = value[10];
         let nox = value[11];
         let luminosity_code = value[12];
+        // byte 13 is reserved
         let measurement_sequence_number = value[14];
         let flags = value[15];
         let mac_address = [value[16], value[17], value[18]];
@@ -270,6 +277,7 @@ mod tests {
             expected: {
                 acceleration_vector_as_milli_g: None,
                 battery_potential_as_millivolts: None,
+                calibration_in_progress: Some(false),
                 carbon_dioxide_as_ppm: Some(201),
                 humidity_as_ppm: Some(553_000),
                 luminosity_as_millilux: Some(13_026_669),
@@ -290,6 +298,7 @@ mod tests {
             expected: {
                 acceleration_vector_as_milli_g: None,
                 battery_potential_as_millivolts: None,
+                calibration_in_progress: Some(true),
                 carbon_dioxide_as_ppm: None,
                 humidity_as_ppm: None,
                 luminosity_as_millilux: None,
@@ -310,6 +319,7 @@ mod tests {
             expected: {
                 acceleration_vector_as_milli_g: None,
                 battery_potential_as_millivolts: None,
+                calibration_in_progress: Some(false),
                 carbon_dioxide_as_ppm: Some(0),
                 humidity_as_ppm: Some(0),
                 luminosity_as_millilux: Some(0),
@@ -330,6 +340,7 @@ mod tests {
             expected: {
                 acceleration_vector_as_milli_g: None,
                 battery_potential_as_millivolts: None,
+                calibration_in_progress: Some(true),
                 carbon_dioxide_as_ppm: Some(40_000),
                 humidity_as_ppm: Some(1_000_000),
                 luminosity_as_millilux: Some(65_535_000),

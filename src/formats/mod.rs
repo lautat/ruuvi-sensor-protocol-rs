@@ -1,9 +1,9 @@
 pub use crate::formats::{
     generic::SensorValues,
     traits::{
-        Acceleration, BatteryPotential, CarbonDioxide, Humidity, Luminosity, MacAddress,
-        MeasurementSequenceNumber, MovementCounter, NitrogenOxides, ParticulateMatter, Pressure,
-        Temperature, TransmitterPower, VolatileOrganicCompounds,
+        Acceleration, BatteryPotential, Calibration, CarbonDioxide, Humidity, Luminosity,
+        MacAddress, MeasurementSequenceNumber, MovementCounter, NitrogenOxides, ParticulateMatter,
+        Pressure, Temperature, TransmitterPower, VolatileOrganicCompounds,
     },
 };
 
