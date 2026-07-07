@@ -16,6 +16,7 @@ mod generic;
 mod traits;
 mod v3;
 mod v5;
+mod v6;
 
 #[cfg(test)]
 mod testing;

@@ -6,7 +6,7 @@ use crate::{
             MeasurementSequenceNumber, MovementCounter, NitrogenOxides, ParticulateMatter,
             Pressure, ProtocolPayload, Temperature, TransmitterPower, VolatileOrganicCompounds,
         },
-        e1, v3, v5, AccelerationVector,
+        e1, v3, v5, v6, AccelerationVector,
     },
 };
 
@@ -53,7 +53,7 @@ const MANUFACTURER_DATA_ID: u16 = 0x0499;
 
 impl SensorValues {
     /// Parses sensor values from the payload encoded in manufacturer specific data -field. At the
-    /// moment versions 3, 5 and E1 of the format are supported.
+    /// moment versions 3, 5, 6 and E1 of the format are supported.
     ///
     /// # Errors
     ///
@@ -340,6 +340,32 @@ mod tests {
     }
 
     test_format_versions! {
+        version v6 {
+            input: &[
+                0x06, 0x17, 0x0C, 0x56, 0x68, 0xC7, 0x9E, 0x00, 0x70, 0x00, 0xC9, 0x05, 0x01,
+                0xD9, 0x00, 0xCD, 0x00, 0x4C, 0x88, 0x4F,
+            ],
+            result: SensorValues {
+                acceleration: None,
+                battery_potential: None,
+                carbon_dioxide: Some(201),
+                humidity: Some(553_000),
+                luminosity: Some(13_026_669),
+                mac_address: Some([0, 0, 0, 0x4C, 0x88, 0x4F]),
+                measurement_sequence_number: Some(205),
+                movement_counter: None,
+                nox_index: Some(1),
+                pm1_0: None,
+                pm2_5: Some(11_200),
+                pm4_0: None,
+                pm10_0: None,
+                pressure: Some(101_102),
+                temperature: Some(29_500 + 273_150),
+                tx_power: None,
+                voc_index: Some(5),
+            },
+        }
+
         version e1 {
             input: &[
                 0xE1, 0x17, 0x0C, 0x56, 0x68, 0xC7, 0x9E, 0x00, 0x65, 0x00, 0x70, 0x04, 0xBD,
