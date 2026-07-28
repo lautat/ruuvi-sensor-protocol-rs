@@ -17,6 +17,8 @@ from source with `cargo doc`. Examples are included in the docs.
 
 ## Changes
 
+### `0.7.1` (unreleased)
+
 ### `0.7.0`
 - Adds support for [data format 6](https://docs.ruuvi.com/communication/bluetooth-advertisements/data-format-6)
 - Adds support for [data format E1 (Extended V1)](https://docs.ruuvi.com/communication/bluetooth-advertisements/data-format-e1)
