@@ -371,7 +371,7 @@ mod tests {
                 calibration_in_progress: Some(false),
                 carbon_dioxide: Some(201),
                 humidity: Some(553_000),
-                luminosity: Some(13_026_669),
+                luminosity: Some(13_026_670),
                 mac_address: Some([0, 0, 0, 0x4C, 0x88, 0x4F]),
                 measurement_sequence_number: Some(205),
                 movement_counter: None,
