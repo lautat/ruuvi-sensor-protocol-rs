@@ -128,12 +128,53 @@ impl TransmitterPower for SensorValues {
     }
 }
 
-impl Calibration for SensorValues {}
-impl CarbonDioxide for SensorValues {}
-impl Luminosity for SensorValues {}
-impl NitrogenOxides for SensorValues {}
-impl ParticulateMatter for SensorValues {}
-impl VolatileOrganicCompounds for SensorValues {}
+impl Calibration for SensorValues {
+    fn calibration_in_progress(&self) -> Option<bool> {
+        None
+    }
+}
+
+impl CarbonDioxide for SensorValues {
+    fn carbon_dioxide_as_ppm(&self) -> Option<u16> {
+        None
+    }
+}
+
+impl Luminosity for SensorValues {
+    fn luminosity_as_millilux(&self) -> Option<u32> {
+        None
+    }
+}
+
+impl NitrogenOxides for SensorValues {
+    fn nox_index(&self) -> Option<u16> {
+        None
+    }
+}
+
+impl ParticulateMatter for SensorValues {
+    fn pm1_0_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+
+    fn pm2_5_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+
+    fn pm4_0_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+
+    fn pm10_0_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+}
+
+impl VolatileOrganicCompounds for SensorValues {
+    fn voc_index(&self) -> Option<u16> {
+        None
+    }
+}
 
 impl ProtocolPayload for SensorValues {
     const VERSION: u8 = 5;

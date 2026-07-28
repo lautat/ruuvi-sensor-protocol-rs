@@ -139,12 +139,24 @@ impl TransmitterPower for SensorValues {
 }
 
 impl ParticulateMatter for SensorValues {
+    fn pm1_0_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+
     fn pm2_5_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
         if self.pm2_5 == 0xFFFF {
             None
         } else {
             Some(u32::from(self.pm2_5) * 100)
         }
+    }
+
+    fn pm4_0_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
+    }
+
+    fn pm10_0_as_nanograms_per_cubic_meter(&self) -> Option<u32> {
+        None
     }
 }
 
